@@ -1,0 +1,114 @@
+[0.176s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools/lib:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_moveit_interface -DCMAKE_INSTALL_PREFIX=/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface
+[0.723s] -- The C compiler identification is GNU 11.4.0
+[1.174s] -- The CXX compiler identification is GNU 11.4.0
+[1.251s] -- Detecting C compiler ABI info
+[2.219s] -- Detecting C compiler ABI info - done
+[2.277s] -- Check for working C compiler: /usr/bin/cc - skipped
+[2.278s] -- Detecting C compile features
+[2.280s] -- Detecting C compile features - done
+[2.315s] -- Detecting CXX compiler ABI info
+[3.201s] -- Detecting CXX compiler ABI info - done
+[3.259s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[3.261s] -- Detecting CXX compile features
+[3.274s] -- Detecting CXX compile features - done
+[3.344s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[5.003s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[6.193s] -- Found interbotix_moveit_interface_msgs: 0.0.0 (/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/share/interbotix_moveit_interface_msgs/cmake)
+[6.970s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[7.049s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[7.188s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[7.321s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[7.524s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[8.175s] -- Found moveit_msgs: 2.2.1 (/opt/ros/humble/share/moveit_msgs/cmake)
+[9.430s] -- Found moveit_ros_planning_interface: 2.5.9 (/opt/ros/humble/share/moveit_ros_planning_interface/cmake)
+[11.911s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: date_time filesystem program_options system thread 
+[12.277s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: chrono date_time filesystem iostreams program_options regex serialization system thread 
+[13.109s] -- Found parameter_traits: 0.4.0 (/opt/ros/humble/share/parameter_traits/cmake)
+[13.743s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[13.821s] -- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[14.900s] -- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[15.217s] -- Found FastRTPS: /opt/ros/humble/include  
+[15.838s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[16.032s] -- Found Threads: TRUE  
+[16.442s] -- Found Eigen3: TRUE (found version "3.4.0") 
+[16.480s] -- Found rclcpp_lifecycle: 16.0.12 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)
+[16.789s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: filesystem 
+[18.294s] -- library: /usr/lib/aarch64-linux-gnu/libcurl.so
+[18.684s] -- Ensuring Eigen3 include directory is part of orocos-kdl CMake target
+[20.464s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread chrono 
+[20.670s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: thread system filesystem regex date_time program_options 
+[20.841s] -- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake (found version "1.74.0") found components: system filesystem date_time program_options thread 
+[21.037s] -- Found moveit_visual_tools: 4.1.2 (/home/emackinnon1/interbotix_ws/install/moveit_visual_tools/share/moveit_visual_tools/cmake)
+[21.546s] -- Setting assimp_DIR to: '/opt/ros/humble/share/rviz_assimp_vendor/cmake/../../../opt/rviz_assimp_vendor/lib/cmake/assimp-4.1'
+[21.658s] -- Setting OGRE_DIR to: '/opt/ros/humble/share/rviz_ogre_vendor/cmake/../../../opt/rviz_ogre_vendor/lib/OGRE/cmake'
+[21.665s] -- Found OGRE
+[21.666s] --   static     : OFF
+[21.667s] --   components : HLMS;MeshLodGenerator;Overlay;Paging;Property;RTShaderSystem;Terrain;Volume
+[21.668s] --   plugins    : Plugin_BSPSceneManager;Plugin_OctreeSceneManager;Plugin_PCZSceneManager;Plugin_ParticleFX;RenderSystem_GL;RenderSystem_GL3Plus;Codec_STBI
+[21.669s] --   media      : /opt/ros/humble/opt/rviz_ogre_vendor/share/OGRE/Media
+[21.670s] -- OGRE_LIBRARIES: OgreHLMS;OgreMeshLodGenerator;OgreOverlay;OgrePaging;OgreProperty;OgreRTShaderSystem;OgreTerrain;OgreVolume;OgreMain
+[21.670s] -- OGRE_LIBRARY_DIRS: /opt/ros/humble/opt/rviz_ogre_vendor/lib
+[21.671s] -- OGRE_PLUGINS: Plugin_BSPSceneManager;Plugin_OctreeSceneManager;Plugin_PCZSceneManager;Plugin_ParticleFX;RenderSystem_GL;RenderSystem_GL3Plus;Codec_STBI
+[21.672s] -- OGRE_PLUGIN_DIR: /opt/ros/humble/opt/rviz_ogre_vendor/lib/OGRE
+[21.673s] -- rviz_ogre_vendor::OgreOverlay for IMPORTED_LOCATION_RELEASE: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreOverlay.so
+[21.674s] -- rviz_ogre_vendor::OgreOverlay for IMPORTED_LOCATION_DEBUG: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreOverlay.so
+[21.675s] -- rviz_ogre_vendor::OgreMain for IMPORTED_LOCATION_RELEASE: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreMain.so
+[21.675s] -- rviz_ogre_vendor::OgreMain for IMPORTED_LOCATION_DEBUG: /opt/ros/humble/opt/rviz_ogre_vendor/lib/libOgreMain.so
+[21.682s] -- Could not find freeimage library
+[21.765s] -- Found ZLIB: /usr/lib/aarch64-linux-gnu/libz.so (found version "1.2.11") 
+[21.786s] -- Found OpenGL: /usr/lib/aarch64-linux-gnu/libOpenGL.so   
+[22.545s] -- Found X11: /usr/include   
+[22.546s] -- Looking for XOpenDisplay in /usr/lib/aarch64-linux-gnu/libX11.so;/usr/lib/aarch64-linux-gnu/libXext.so
+[23.256s] -- Looking for XOpenDisplay in /usr/lib/aarch64-linux-gnu/libX11.so;/usr/lib/aarch64-linux-gnu/libXext.so - found
+[23.259s] -- Looking for gethostbyname
+[23.976s] -- Looking for gethostbyname - found
+[23.977s] -- Looking for connect
+[24.686s] -- Looking for connect - found
+[24.689s] -- Looking for remove
+[25.260s] -- Looking for remove - found
+[25.263s] -- Looking for shmat
+[25.758s] -- Looking for shmat - found
+[25.761s] -- Looking for IceConnectionNumber in ICE
+[26.262s] -- Looking for IceConnectionNumber in ICE - found
+[27.003s] -- Found ament_lint_auto: 0.12.12 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[27.788s] -- Added test 'copyright' to check source files copyright and LICENSE
+[27.805s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[27.808s] -- Configured cppcheck include dirs: /home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_moveit_interface/include
+[27.809s] -- Configured cppcheck exclude dirs and/or files: 
+[27.828s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[27.828s] -- Configured cpplint exclude dirs and/or files: 
+[27.838s] -- Added test 'lint_cmake' to check CMake code style
+[27.858s] -- Added test 'uncrustify' to check C / C++ code style
+[27.860s] -- Configured uncrustify additional arguments: 
+[27.866s] -- Added test 'xmllint' to check XML markup files
+[27.882s] -- Configuring done
+[28.212s] -- Generating done
+[28.285s] -- Build files have been written to: /home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface
+[28.400s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface' returned '0': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools/lib:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_moveit_interface -DCMAKE_INSTALL_PREFIX=/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface
+[28.403s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools/lib:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface -- -j4 -l4
+[28.747s] [ 33%] [32mBuilding CXX object CMakeFiles/moveit_interface.dir/src/moveit_interface.cpp.o[0m
+[100.389s] [ 66%] [32mBuilding CXX object CMakeFiles/moveit_interface.dir/src/moveit_interface_obj.cpp.o[0m
+[164.567s] [100%] [32m[1mLinking CXX executable moveit_interface[0m
+[168.244s] [100%] Built target moveit_interface
+[168.288s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface' returned '0': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools/lib:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface -- -j4 -l4
+[168.301s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools/lib:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface
+[168.331s] -- Install configuration: ""
+[168.331s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/lib/interbotix_moveit_interface/moveit_interface
+[168.346s] -- Set runtime path of "/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/lib/interbotix_moveit_interface/moveit_interface" to ""
+[168.347s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/lib/interbotix_moveit_interface/moveit_interface_gui
+[168.350s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/ament_index/resource_index/package_run_dependencies/interbotix_moveit_interface
+[168.351s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/ament_index/resource_index/parent_prefix_path/interbotix_moveit_interface
+[168.353s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/environment/ament_prefix_path.sh
+[168.354s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/environment/ament_prefix_path.dsv
+[168.356s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/environment/path.sh
+[168.357s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/environment/path.dsv
+[168.358s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/local_setup.bash
+[168.360s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/local_setup.sh
+[168.361s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/local_setup.zsh
+[168.362s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/local_setup.dsv
+[168.364s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/package.dsv
+[168.366s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/ament_index/resource_index/packages/interbotix_moveit_interface
+[168.367s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/cmake/interbotix_moveit_interfaceConfig.cmake
+[168.368s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/cmake/interbotix_moveit_interfaceConfig-version.cmake
+[168.370s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface/share/interbotix_moveit_interface/package.xml
+[168.377s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface' returned '0': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/moveit_visual_tools/lib:/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_moveit_interface_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/emackinnon1/interbotix_ws/build/interbotix_moveit_interface

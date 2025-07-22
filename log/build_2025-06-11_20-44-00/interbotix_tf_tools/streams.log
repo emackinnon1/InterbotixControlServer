@@ -1,0 +1,84 @@
+[0.050s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_tf_tools': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_tf_tools -DCMAKE_INSTALL_PREFIX=/home/emackinnon1/interbotix_ws/install/interbotix_tf_tools
+[0.374s] -- The C compiler identification is GNU 11.4.0
+[0.713s] -- The CXX compiler identification is GNU 11.4.0
+[0.767s] -- Detecting C compiler ABI info
+[1.164s] -- Detecting C compiler ABI info - done
+[1.194s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.196s] -- Detecting C compile features
+[1.199s] -- Detecting C compile features - done
+[1.215s] -- Detecting CXX compiler ABI info
+[1.678s] -- Detecting CXX compiler ABI info - done
+[1.708s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.711s] -- Detecting CXX compile features
+[1.715s] -- Detecting CXX compile features - done
+[1.757s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[2.659s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[3.479s] -- Found geometry_msgs: 4.8.0 (/opt/ros/humble/share/geometry_msgs/cmake)
+[3.963s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[4.029s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[4.122s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[4.239s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[4.406s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[4.739s] -- Found rclcpp: 16.0.12 (/opt/ros/humble/share/rclcpp/cmake)
+[5.119s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[5.152s] -- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[5.926s] -- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[6.265s] -- Found FastRTPS: /opt/ros/humble/include  
+[6.743s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[6.844s] -- Looking for pthread.h
+[7.302s] -- Looking for pthread.h - found
+[7.306s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[7.771s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[7.782s] -- Found Threads: TRUE  
+[8.129s] -- Found rclcpp_components: 16.0.12 (/opt/ros/humble/share/rclcpp_components/cmake)
+[8.432s] -- Found tf2_msgs: 0.25.12 (/opt/ros/humble/share/tf2_msgs/cmake)
+[8.759s] -- Found tf2_ros: 0.25.12 (/opt/ros/humble/share/tf2_ros/cmake)
+[9.038s] -- Found ament_lint_auto: 0.12.12 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[9.728s] -- Added test 'copyright' to check source files copyright and LICENSE
+[9.747s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[9.748s] -- Configured cppcheck include dirs: /home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_tf_tools/include
+[9.748s] -- Configured cppcheck exclude dirs and/or files: 
+[9.771s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[9.772s] -- Configured cpplint exclude dirs and/or files: 
+[9.777s] -- Added test 'flake8' to check Python code syntax and style conventions
+[9.790s] -- Added test 'lint_cmake' to check CMake code style
+[9.791s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[9.805s] -- Added test 'uncrustify' to check C / C++ code style
+[9.806s] -- Configured uncrustify additional arguments: 
+[9.812s] -- Added test 'xmllint' to check XML markup files
+[9.826s] -- Configuring done
+[9.921s] -- Generating done
+[9.952s] -- Build files have been written to: /home/emackinnon1/interbotix_ws/build/interbotix_tf_tools
+[10.026s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_tf_tools' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_tf_tools -DCMAKE_INSTALL_PREFIX=/home/emackinnon1/interbotix_ws/install/interbotix_tf_tools
+[10.028s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_tf_tools': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/emackinnon1/interbotix_ws/build/interbotix_tf_tools -- -j4 -l4
+[10.375s] [ 50%] [32mBuilding CXX object CMakeFiles/tf_rebroadcaster.dir/src/tf_rebroadcaster.cpp.o[0m
+[69.962s] [100%] [32m[1mLinking CXX shared library libtf_rebroadcaster.so[0m
+[72.932s] [100%] Built target tf_rebroadcaster
+[72.982s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_tf_tools' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/emackinnon1/interbotix_ws/build/interbotix_tf_tools -- -j4 -l4
+[73.004s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_tf_tools': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/emackinnon1/interbotix_ws/build/interbotix_tf_tools
+[73.035s] -- Install configuration: ""
+[73.038s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/lib/libtf_rebroadcaster.so
+[73.096s] -- Set runtime path of "/home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/lib/libtf_rebroadcaster.so" to ""
+[73.099s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/lib/interbotix_tf_tools/static_trans_pub.py
+[73.103s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools//config
+[73.106s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools//config/tf_rebroadcaster.yaml
+[73.108s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools//launch
+[73.111s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools//launch/static_transform_pub.launch.py
+[73.114s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools//launch/tf_rebroadcaster.launch.py
+[73.117s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/ament_index/resource_index/package_run_dependencies/interbotix_tf_tools
+[73.120s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/ament_index/resource_index/parent_prefix_path/interbotix_tf_tools
+[73.122s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/environment/ament_prefix_path.sh
+[73.124s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/environment/ament_prefix_path.dsv
+[73.126s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/environment/path.sh
+[73.128s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/environment/path.dsv
+[73.130s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/local_setup.bash
+[73.131s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/local_setup.sh
+[73.134s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/local_setup.zsh
+[73.135s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/local_setup.dsv
+[73.137s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/package.dsv
+[73.139s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/ament_index/resource_index/packages/interbotix_tf_tools
+[73.141s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/ament_index/resource_index/rclcpp_components/interbotix_tf_tools
+[73.144s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/cmake/interbotix_tf_toolsConfig.cmake
+[73.145s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/cmake/interbotix_tf_toolsConfig-version.cmake
+[73.147s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_tf_tools/share/interbotix_tf_tools/package.xml
+[73.158s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_tf_tools' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/emackinnon1/interbotix_ws/build/interbotix_tf_tools

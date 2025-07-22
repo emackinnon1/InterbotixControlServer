@@ -1,0 +1,103 @@
+[0.096s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_xs_toolbox/interbotix_xs_ros_control -DCMAKE_INSTALL_PREFIX=/home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control
+[0.468s] -- The C compiler identification is GNU 11.4.0
+[0.893s] -- The CXX compiler identification is GNU 11.4.0
+[0.938s] -- Detecting C compiler ABI info
+[1.402s] -- Detecting C compiler ABI info - done
+[1.439s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.443s] -- Detecting C compile features
+[1.448s] -- Detecting C compile features - done
+[1.468s] -- Detecting CXX compiler ABI info
+[2.007s] -- Detecting CXX compiler ABI info - done
+[2.049s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[2.054s] -- Detecting CXX compile features
+[2.058s] -- Detecting CXX compile features - done
+[2.100s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[3.257s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[4.071s] -- Found hardware_interface: 2.50.0 (/opt/ros/humble/share/hardware_interface/cmake)
+[4.498s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[4.559s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[4.634s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[4.728s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[4.863s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[6.454s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[6.487s] -- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[6.750s] -- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND
+[7.042s] -- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[7.058s] -- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND
+[7.152s] -- Found FastRTPS: /opt/ros/humble/include  
+[7.167s] -- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND
+[7.205s] -- Found TinyXML2 via Config file: TinyXML2_DIR-NOTFOUND
+[7.256s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[7.361s] -- Looking for pthread.h
+[7.845s] -- Looking for pthread.h - found
+[7.848s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[8.316s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[8.323s] -- Found Threads: TRUE  
+[8.658s] -- Found interbotix_xs_msgs: 0.0.0 (/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/share/interbotix_xs_msgs/cmake)
+[8.790s] -- Found ament_lint_auto: 0.12.12 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[9.515s] -- Found ros2_control_test_assets: 2.50.0 (/opt/ros/humble/share/ros2_control_test_assets/cmake)
+[9.545s] -- Found gmock sources under '/opt/ros/humble/src/gmock_vendor': C++ tests using 'Google Mock' will be built
+[9.602s] -- Found ament_cmake_gtest: 1.3.11 (/opt/ros/humble/share/ament_cmake_gtest/cmake)
+[9.607s] -- Found gtest sources under '/opt/ros/humble/src/gtest_vendor': C++ tests using 'Google Test' will be built
+[9.662s] -- Added test 'copyright' to check source files copyright and LICENSE
+[9.675s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[9.676s] -- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_xs_toolbox/interbotix_xs_ros_control/include>;/home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_xs_toolbox/interbotix_xs_ros_control/include
+[9.677s] -- Configured cppcheck exclude dirs and/or files: 
+[9.688s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[9.689s] -- Configured cpplint exclude dirs and/or files: 
+[9.694s] -- Added test 'lint_cmake' to check CMake code style
+[9.709s] -- Added test 'uncrustify' to check C / C++ code style
+[9.710s] -- Configured uncrustify additional arguments: 
+[9.713s] -- Added test 'xmllint' to check XML markup files
+[9.739s] -- Configuring done
+[10.134s] -- Generating done
+[10.195s] -- Build files have been written to: /home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control
+[10.280s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control' returned '0': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/emackinnon1/interbotix_ws/src/interbotix_ros_toolboxes/interbotix_xs_toolbox/interbotix_xs_ros_control -DCMAKE_INSTALL_PREFIX=/home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control
+[10.293s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control -- -j4 -l4
+[10.872s] [ 11%] [32mBuilding CXX object gmock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o[0m
+[10.882s] [ 22%] [32mBuilding CXX object CMakeFiles/interbotix_xs_ros_control.dir/src/xs_hardware_interface.cpp.o[0m
+[10.914s] [ 33%] [32mBuilding CXX object gmock/CMakeFiles/gmock.dir/opt/ros/humble/src/gtest_vendor/src/gtest-all.cc.o[0m
+[10.950s] [ 44%] [32mBuilding CXX object gmock/CMakeFiles/gmock.dir/src/gmock-all.cc.o[0m
+[24.386s] [ 55%] [32m[1mLinking CXX static library libgmock_main.a[0m
+[24.840s] [ 55%] Built target gmock_main
+[49.173s] [ 66%] [32m[1mLinking CXX static library libgmock.a[0m
+[49.853s] [ 66%] Built target gmock
+[107.147s] [ 77%] [32m[1mLinking CXX shared library libinterbotix_xs_ros_control.so[0m
+[112.865s] [ 77%] Built target interbotix_xs_ros_control
+[113.000s] [ 88%] [32mBuilding CXX object CMakeFiles/test_load_xs_hardware_interface.dir/test/test_load_xs_hardware_interface.cpp.o[0m
+[145.037s] [100%] [32m[1mLinking CXX executable test_load_xs_hardware_interface[0m
+[147.262s] [100%] Built target test_load_xs_hardware_interface
+[147.322s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control' returned '0': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control -- -j4 -l4
+[147.336s] Invoking command in '/home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control
+[147.378s] -- Install configuration: ""
+[147.379s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/interbotix_xs_ros_control.xml
+[147.381s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/include
+[147.382s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/include/interbotix_xs_ros_control
+[147.383s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/include/interbotix_xs_ros_control/xs_hardware_interface.hpp
+[147.385s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/lib/libinterbotix_xs_ros_control.so
+[147.459s] -- Set runtime path of "/home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/lib/libinterbotix_xs_ros_control.so" to ""
+[147.460s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/environment/library_path.sh
+[147.461s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/environment/library_path.dsv
+[147.463s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/ament_index/resource_index/package_run_dependencies/interbotix_xs_ros_control
+[147.465s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/ament_index/resource_index/parent_prefix_path/interbotix_xs_ros_control
+[147.467s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/environment/ament_prefix_path.sh
+[147.469s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/environment/ament_prefix_path.dsv
+[147.472s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/environment/path.sh
+[147.474s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/environment/path.dsv
+[147.475s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/local_setup.bash
+[147.477s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/local_setup.sh
+[147.479s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/local_setup.zsh
+[147.480s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/local_setup.dsv
+[147.482s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/package.dsv
+[147.484s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/ament_index/resource_index/packages/interbotix_xs_ros_control
+[147.487s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/interbotix_xs_ros_control
+[147.489s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/cmake/export_interbotix_xs_ros_controlExport.cmake
+[147.492s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/cmake/export_interbotix_xs_ros_controlExport-noconfig.cmake
+[147.494s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/cmake/ament_cmake_export_include_directories-extras.cmake
+[147.496s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/cmake/ament_cmake_export_libraries-extras.cmake
+[147.498s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/cmake/ament_cmake_export_targets-extras.cmake
+[147.499s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/cmake/ament_cmake_export_dependencies-extras.cmake
+[147.501s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/cmake/interbotix_xs_ros_controlConfig.cmake
+[147.503s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/cmake/interbotix_xs_ros_controlConfig-version.cmake
+[147.505s] -- Installing: /home/emackinnon1/interbotix_ws/install/interbotix_xs_ros_control/share/interbotix_xs_ros_control/package.xml
+[147.535s] Invoked command in '/home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control' returned '0': AMENT_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/emackinnon1/interbotix_ws/install/interbotix_xs_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --install /home/emackinnon1/interbotix_ws/build/interbotix_xs_ros_control
