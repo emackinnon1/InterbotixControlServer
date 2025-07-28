@@ -30,3 +30,8 @@ emackinnon1@rpi4-widowx250:~/InterbotixControlServer$ ros2 service list
 /wx250/xs_sdk/set_parameters_atomically
 
 ```
+
+Will need to rebuild the interbotix_xsarm_control package
+```bash
+colcon build --packages-select interbotix_xsarm_control
+```
