@@ -39,5 +39,13 @@ WARNING: Be aware that are nodes in the graph that share an exact name, this can
 /wx250/rviz2
 /wx250/transform_listener_impl_aaaacf2bb6e0
 /wx250/xs_sdk
+```
 
+Will need to rebuild the interbotix_xsarm_control package if adding 
+```python
+on_exit=Shutdown() # Try shutting down on exit
+```
+back on line 105 in `install/interbotix_xsarm_control/share/interbotix_xsarm_control/launch/xsarm_control.launch.py`
+```bash
+colcon build --packages-select interbotix_xsarm_control
 ```
