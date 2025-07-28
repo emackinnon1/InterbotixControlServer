@@ -38,6 +38,7 @@ from launch.actions import (
     DeclareLaunchArgument,
     IncludeLaunchDescription,
     OpaqueFunction,
+    Shutdown
 )
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -101,6 +102,7 @@ def launch_setup(context, *args, **kwargs):
             'xs_driver_logging_level': xs_driver_logging_level_launch_arg,
         }],
         output={'both': 'screen'},
+        on_exit=Shutdown() # Try shutting down on exit
     )
 
     xs_sdk_sim_node = Node(
