@@ -57,7 +57,7 @@ def open_bottle(bot):
     bot.arm.set_ee_cartesian_trajectory(z=-0.2)
     print("open bottle 4: lower end effector")
     time.sleep(5)
-    bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/4.85)
+    bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/4.75) # 5 for sapporo beer
     print("open bottle 5: bottle opener in place")
     time.sleep(3)
     bot.arm.set_single_joint_position(joint_name='wrist_rotate', position=np.pi/1.2, moving_time=0.5)
