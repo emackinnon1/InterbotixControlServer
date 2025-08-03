@@ -9,7 +9,7 @@ import numpy as np
 def bottle_opener(bot, put_back):
     if not put_back:
         bot.gripper.release()
-    bot.arm.go_to_home_pose(moving_time=2.0)
+    bot.arm.go_to_home_pose(moving_time=1.75)
     # time.sleep(2.0)
     # bot.arm.set_ee_pose_components(x=0.268, z=0.23)
     bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/1.89)
@@ -57,7 +57,7 @@ def open_bottle(bot):
     bot.arm.set_ee_cartesian_trajectory(z=-0.2)
     print("open bottle 4: lower end effector")
     time.sleep(5)
-    bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/5)
+    bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/4.85)
     print("open bottle 5: bottle opener in place")
     time.sleep(3)
     bot.arm.set_single_joint_position(joint_name='wrist_rotate', position=np.pi/1.2, moving_time=0.5)

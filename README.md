@@ -30,3 +30,14 @@ emackinnon1@rpi4-widowx250:~/InterbotixControlServer$ ros2 service list
 /wx250/xs_sdk/set_parameters_atomically
 
 ```
+
+```bash
+emackinnon1@rpi4-widowx250:~/InterbotixControlServer$ ros2 node list
+WARNING: Be aware that are nodes in the graph that share an exact name, this can have unintended side effects.
+/wx250/robot_state_publisher
+/wx250/rviz2
+/wx250/rviz2
+/wx250/transform_listener_impl_aaaacf2bb6e0
+/wx250/xs_sdk
+
+```
