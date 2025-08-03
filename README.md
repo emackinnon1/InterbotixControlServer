@@ -31,7 +31,22 @@ emackinnon1@rpi4-widowx250:~/InterbotixControlServer$ ros2 service list
 
 ```
 
-Will need to rebuild the interbotix_xsarm_control package
+```bash
+emackinnon1@rpi4-widowx250:~/InterbotixControlServer$ ros2 node list
+WARNING: Be aware that are nodes in the graph that share an exact name, this can have unintended side effects.
+/wx250/robot_state_publisher
+/wx250/rviz2
+/wx250/rviz2
+/wx250/transform_listener_impl_aaaacf2bb6e0
+/wx250/xs_sdk
+```
+
+Will need to rebuild the interbotix_xsarm_control package if adding 
+```python
+on_exit=Shutdown() # Try shutting down on exit
+```
+back on line 105 in `install/interbotix_xsarm_control/share/interbotix_xsarm_control/launch/xsarm_control.launch.py`
+
 ```bash
 colcon build --packages-select interbotix_xsarm_control
 ```
