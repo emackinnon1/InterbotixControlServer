@@ -220,6 +220,15 @@ class ROSLaunchManager:
         time.sleep(2)  # Give it time to fully stop
         return self.start_ros_launch()
 
+def get_ros_manager():
+    """
+    Dependency function to get a singleton ROSLaunchManager instance.
+    This ensures we reuse the same manager instance across all requests.
+    """
+    if not hasattr(get_ros_manager, "_instance"):
+        get_ros_manager._instance = ROSLaunchManager("wx250")
+    return get_ros_manager._instance
+
 
 # Example usage
 if __name__ == "__main__":

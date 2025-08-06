@@ -5,7 +5,7 @@ Demonstrates usage patterns and error handling.
 """
 
 import time
-from ros_status import ROSLaunchManager, ROSStatus
+from dependencies.ros_manager import ROSLaunchManager, ROSStatus
 
 
 def main():

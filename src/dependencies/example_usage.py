@@ -4,7 +4,7 @@ Example usage of ROSLaunchManager for common scenarios.
 """
 
 import time
-from ros_status import ROSLaunchManager, ROSStatus
+from dependencies.ros_manager import ROSLaunchManager, ROSStatus
 
 
 def example_basic_usage():
