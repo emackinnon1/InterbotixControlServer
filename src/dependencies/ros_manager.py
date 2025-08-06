@@ -114,40 +114,59 @@ class ROSLaunchManager:
     
     def stop_ros_launch(self) -> bool:
         """
-        Stop the ROS launch process gracefully.
+        Stop the ROS launch process gracefully using pkill.
         
         Returns:
             bool: True if stopped successfully, False otherwise
         """
-        if not self.is_running():
-            return True
-        
         try:
             self.status = ROSStatus.STOPPING
+            self.error_message = None
             
-            # Try graceful shutdown first
+            # First, try to stop our managed process gracefully if it exists
             if self.process:
-                # Send SIGTERM to the process group
-                os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
-                
-                # Wait for graceful shutdown
                 try:
-                    self.process.wait(timeout=10)
-                except subprocess.TimeoutExpired:
-                    # Force kill if graceful shutdown fails
-                    os.killpg(os.getpgid(self.process.pid), signal.SIGKILL)
-                    self.process.wait()
+                    # Send SIGTERM to the process group
+                    os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+                    # Wait briefly for graceful shutdown
+                    self.process.wait(timeout=3)
+                except (subprocess.TimeoutExpired, ProcessLookupError):
+                    # Process might already be gone, continue with pkill
+                    pass
+                except Exception as e:
+                    # Log the error but continue with pkill approach
+                    self.error_message = f"Warning during process cleanup: {str(e)}"
                 
                 self.process = None
+            
+            # Use pkill to stop all ROS processes more efficiently
+            result = subprocess.run(
+                ["pkill", "-f", "/opt/ros/humble"],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            # pkill returns 0 if processes were found and killed, 1 if no processes found
+            # Both are considered success for our purposes
+            if result.returncode in [0, 1]:
+                # Give processes time to terminate
+                time.sleep(2)
                 self.status = ROSStatus.NOT_RUNNING
                 return True
+            else:
+                self.error_message = f"pkill failed with return code {result.returncode}: {result.stderr}"
+                self.status = ROSStatus.ERROR
+                return False
                 
+        except subprocess.TimeoutExpired:
+            self.error_message = "Timeout while stopping ROS processes"
+            self.status = ROSStatus.ERROR
+            return False
         except Exception as e:
             self.error_message = f"Failed to stop ROS launch: {str(e)}"
             self.status = ROSStatus.ERROR
             return False
-        
-        return False
     
     def is_running(self) -> bool:
         """
