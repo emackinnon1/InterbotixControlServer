@@ -9,7 +9,7 @@ ros_router = APIRouter(
     tags=["ros"]
 )
 
-@ros_router.post("/running")
+@ros_router.get("/running")
 async def ros_running():
     manager = ROSLaunchManager("wx250")
     return {"is_running": manager.check_ros2_running()}
