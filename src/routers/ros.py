@@ -1,7 +1,7 @@
 # endpoints to report ros status, restart ros2, or kill pids
 # create dependency to double check ROS status before running commands
 from fastapi import APIRouter, Depends, HTTPException
-from dependencies.ros_manager import ROSLaunchManager, get_ros_manager
+from src.dependencies.ros_manager import ROSLaunchManager, get_ros_manager
 
 ros_router = APIRouter(
     prefix="/ros",

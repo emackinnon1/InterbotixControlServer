@@ -27,9 +27,10 @@ class ROSLaunchManager:
         self.status = ROSStatus.NOT_RUNNING
         self.error_message: Optional[str] = None
         self.launch_command = [
-            "roslaunch", 
+            "ros2",
+            "launch", 
             "interbotix_xsarm_control", 
-            "xsarm_control.launch", 
+            "xsarm_control.launch.py", 
             f"robot_model:={robot_model}"
         ]
     
