@@ -52,7 +52,10 @@ def bottle_opener(bot: InterbotixManipulatorXS, put_back: bool):
     # bot.arm.go_to_home_pose()
 
 
-def open_bottle(bot: InterbotixManipulatorXS, brand: str="sapporo"):
+def open_bottle(bot: InterbotixManipulatorXS, brand: str):
+    if not brand:
+        print("BEER BRAND REQUIRED. REPLACING BOTTLE OPENER.")
+        return
     bot.arm.go_to_home_pose()
     # bot.gripper.grasp()
     bot.arm.set_ee_pose_components(x=0.21, z=0.35)
@@ -105,4 +108,4 @@ def open_beer(brand: str):
 
 
 if __name__ == '__main__':
-    open_beer()
+    open_beer("heineken")
