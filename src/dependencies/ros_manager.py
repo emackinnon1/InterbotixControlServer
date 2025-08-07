@@ -141,7 +141,7 @@ class ROSLaunchManager:
             
             # Use pkill to stop all ROS processes more efficiently
             result = subprocess.run(
-                ["pkill", "-f", "/opt/ros/humble"],
+                ["pkill", "-f", self.ros_root],
                 capture_output=True,
                 text=True,
                 timeout=10
