@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.routers.scripts import scripts_router
+from routers.task import scripts_router
 from src.routers.arm import arm_router
 from src.routers.ros import ros_router
 

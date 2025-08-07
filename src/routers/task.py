@@ -1,3 +1,5 @@
+from enum import Enum
+
 from fastapi import APIRouter, Depends, HTTPException
 from src.interbotix_ros_manipulators.interbotix_ros_xsarms.interbotix_xsarm_control.scripts.open_beer import main
 # src/interbotix_ros_manipulators/interbotix_ros_xsarms/interbotix_xsarm_control/scripts/open_beer.py
@@ -7,9 +9,18 @@ scripts_router = APIRouter(
     tags=["scripts"]
 )
 
-@scripts_router.post("/run/{script_name}")
+class TasksEnum(Enum):
+    open_beer_bottle="open_beer_bottle"
+
+class BeerBrandEnum(Enum):
+    sapporo="sapporo"
+    heineken="heineken"
+
+# POST /task/open_beer_bottle?beer_brand=sapporo
+@scripts_router.post("/task/{task_name}")
 async def run_script(
-    script_name: str
+    task_name: TasksEnum,
+    beer_brand: BeerBrandEnum
 ):
-    {"open_beer": main}[script_name]()
-    return {"script_called": script_name}
+    {"open_beer_bottle": main}[task_name](beer_brand)
+    return {"task_name": task_name}
