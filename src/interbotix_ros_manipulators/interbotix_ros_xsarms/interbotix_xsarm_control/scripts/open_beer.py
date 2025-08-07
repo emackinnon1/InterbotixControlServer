@@ -4,9 +4,19 @@ from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_s
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 import numpy as np
 
+# can add the unique "open_bottle" steps if more are needed depending on size of
+# other brands
+BRAND_CONFIGS = {
+    "sapporo": {
+        "waist_position": -np.pi/5
+    },
+    "heineken": {
+        "waist_position": -np.pi/4.75
+    }
+}
 
 
-def bottle_opener(bot, put_back):
+def bottle_opener(bot: InterbotixManipulatorXS, put_back: bool):
     if not put_back:
         bot.gripper.release()
     bot.arm.go_to_home_pose(moving_time=1.75)
@@ -42,7 +52,7 @@ def bottle_opener(bot, put_back):
     # bot.arm.go_to_home_pose()
 
 
-def open_bottle(bot):
+def open_bottle(bot: InterbotixManipulatorXS, brand: str="sapporo"):
     bot.arm.go_to_home_pose()
     # bot.gripper.grasp()
     bot.arm.set_ee_pose_components(x=0.21, z=0.35)
@@ -57,7 +67,9 @@ def open_bottle(bot):
     bot.arm.set_ee_cartesian_trajectory(z=-0.2)
     print("open bottle 4: lower end effector")
     time.sleep(5)
-    bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/4.75) # 5 for sapporo beer
+    # get correct waist rotation
+    waist_rotation_config = BRAND_CONFIGS.get(brand, BRAND_CONFIGS["sapporo"])  # default to sapporo
+    bot.arm.set_single_joint_position(joint_name='waist', position=waist_rotation_config) # 5 for sapporo beer
     print("open bottle 5: bottle opener in place")
     time.sleep(3)
     bot.arm.set_single_joint_position(joint_name='wrist_rotate', position=np.pi/1.2, moving_time=0.5)
@@ -67,9 +79,7 @@ def open_bottle(bot):
     bot.arm.go_to_home_pose(moving_time=2.0)
 
 
-
-
-def main():
+def open_beer(brand: str):
 
     bot = InterbotixManipulatorXS(
         robot_model='wx250',
@@ -85,7 +95,7 @@ def main():
 
     # bot.arm.go_to_home_pose()
     bottle_opener(bot, False)
-    open_bottle(bot)
+    open_bottle(bot, brand)
     bottle_opener(bot, True)
     
     bot.arm.go_to_home_pose()
@@ -95,4 +105,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    open_beer()
