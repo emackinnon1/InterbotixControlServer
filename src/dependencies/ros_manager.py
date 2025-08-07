@@ -60,7 +60,7 @@ class ROSLaunchManager:
             # Filter out this script's own process
             filtered_output = []
             for line in ros_processes.stdout.splitlines():
-                if "ros_status.py" not in line and "grep -i ros" not in line:
+                if "ros_manager.py" not in line and "grep -i ros" not in line:
                     filtered_output.append(line)
             
             return len(filtered_output) > 0
