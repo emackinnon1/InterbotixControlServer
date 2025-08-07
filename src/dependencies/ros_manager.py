@@ -33,6 +33,7 @@ class ROSLaunchManager:
             "xsarm_control.launch.py", 
             f"robot_model:={robot_model}"
         ]
+        self.ros_root = "/opt/ros/humble"
     
     def check_ros2_running(self) -> bool:
         """
