@@ -8,10 +8,10 @@ import numpy as np
 # other brands
 BRAND_CONFIGS = {
     "sapporo": {
-        "waist_position": -np.pi/5
+        "waist_rotation": -np.pi/5
     },
     "heineken": {
-        "waist_position": -np.pi/4.75
+        "waist_rotation": -np.pi/4.75
     }
 }
 
@@ -57,26 +57,26 @@ def open_bottle(bot: InterbotixManipulatorXS, brand: str="sapporo"):
     # bot.gripper.grasp()
     bot.arm.set_ee_pose_components(x=0.21, z=0.35)
     print("open bottle 1: inital pose")
-    time.sleep(3)
+    time.sleep(2.5)
     bot.arm.set_single_joint_position(joint_name='wrist_rotate', position=np.pi/3.5)
     print("open bottle 2: rotate wrist")
-    time.sleep(3)
+    time.sleep(2.5)
     bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/5.65)
     print("open bottle 3: rotate waist")
-    time.sleep(3)
+    time.sleep(2.5)
     bot.arm.set_ee_cartesian_trajectory(z=-0.2)
     print("open bottle 4: lower end effector")
     time.sleep(5)
     # get correct waist rotation
-    waist_rotation_config = BRAND_CONFIGS.get(brand, BRAND_CONFIGS["sapporo"])  # default to sapporo
+    waist_rotation_config = BRAND_CONFIGS.get(brand, BRAND_CONFIGS["sapporo"]["waist_rotation"])  # default to sapporo
     bot.arm.set_single_joint_position(joint_name='waist', position=waist_rotation_config) # 5 for sapporo beer
     print("open bottle 5: bottle opener in place")
-    time.sleep(3)
+    time.sleep(2.5)
     bot.arm.set_single_joint_position(joint_name='wrist_rotate', position=np.pi/1.2, moving_time=0.5)
     bot.arm.set_ee_cartesian_trajectory(z=0.1)
     bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/5.65, moving_time=1.5)
     print("open bottle 6: raise, rotatewrist and open")
-    bot.arm.go_to_home_pose(moving_time=2.0)
+    bot.arm.go_to_home_pose(moving_time=1.75)
 
 
 def open_beer(brand: str):
