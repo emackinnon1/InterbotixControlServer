@@ -5,6 +5,7 @@ from enum import Enum, auto
 from typing import Dict, List, Any, Optional, TypeVar, Generic
 from dataclasses import dataclass
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_startup
 
 StateType = TypeVar('StateType', bound=Enum)
 
@@ -129,6 +130,40 @@ class AbstractStateMachine(Generic[StateType], ABC):
                 return False
                 
         return self.state == self.get_complete_state()
+    
+    def run_with_robot_management(self) -> bool:
+        """Run the complete state machine with proper robot initialization and cleanup"""
+        try:
+            # Initialize robot
+            # robot_startup()
+            self.bot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
+            
+            # Run the state machine
+            success = self.run()
+            
+            if success:
+                print(f"{self.__class__.__name__} completed successfully!")
+            else:
+                print(f"{self.__class__.__name__} failed!")
+            
+            # Return to safe positions
+            self.bot.arm.go_to_home_pose()
+            self.bot.arm.go_to_sleep_pose()
+            time.sleep(0.5)
+            
+            return success
+            
+        except Exception as e:
+            print(f"Error during {self.__class__.__name__} execution: {e}")
+            return False
+            
+        finally:
+            # Always disable torque and shutdown
+            try:
+                self.bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
+                # robot_shutdown()
+            except Exception as e:
+                print(f"Error during robot shutdown: {e}")
     
     def _execute_current_sequence(self) -> bool:
         """Execute the current movement in the current sequence"""
