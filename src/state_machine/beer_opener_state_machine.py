@@ -57,10 +57,52 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         pickup_opener_sequence = MovementSequence("pickup_opener", [
             Movement(MovementType.GRIPPER_ACTION, {'action': 'release'}, "Release gripper"),
             Movement(MovementType.GO_HOME, {'moving_time': 1.75}, "Go to home pose"),
-            # ... rest of your movements
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_PICKUP_POSITION}, "Rotate to pickup position"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': LOWER_DISTANCE, 'x': REVERSE_DISTANCE}, "Lower and move to opener"),
+            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait for stabilization"),
+            Movement(MovementType.CARTESIAN_MOVE, {'x': REVERSE_DISTANCE}, "Align with opener"),
+            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait for alignment"),
+            Movement(MovementType.CARTESIAN_MOVE, {'pitch': 1.5}, "Adjust wrist pitch"),
+            Movement(MovementType.WAIT, {'duration': 1.5}, "Wait for pitch adjustment"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_GRASP}, "Rotate wrist for grasp"),
+            Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': GRIPPER_LOWER_DISTANCE}, "Lower to grasp opener"),
+            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait before grasping"),
+            Movement(MovementType.GRIPPER_ACTION, {'action': 'grasp'}, "Grasp bottle opener"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': RAISE_DISTANCE}, "Raise with opener"),
+            Movement(MovementType.WAIT, {'duration': 1.5}, "Wait after pickup")
         ])
         
-        # ... other sequences
+                
+        approach_bottle_sequence = MovementSequence("approach_bottle", [
+            Movement(MovementType.GO_HOME, {}, "Go to home pose"),
+            Movement(MovementType.POSE_COMPONENTS, {'x': 0.21, 'z': 0.35}, "Move to bottle approach position"),
+            Movement(MovementType.WAIT, {'duration': 1.0}, "Wait at approach position"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_INITIAL}, "Rotate wrist for bottle"),
+            Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION}, "Rotate waist to bottle"),
+            Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for waist rotation"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_LOWER_DISTANCE}, "Lower to bottle level"),
+            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait at bottle level")
+        ])
+        
+        return_opener_sequence = MovementSequence("return_opener", [
+            Movement(MovementType.GO_HOME, {'moving_time': 1.75}, "Go to home pose"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_PICKUP_POSITION}, "Rotate to return position"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': LOWER_DISTANCE, 'x': REVERSE_DISTANCE}, "Lower to return opener"),
+            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait for positioning"),
+            Movement(MovementType.CARTESIAN_MOVE, {'x': REVERSE_DISTANCE}, "Align for return"),
+            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait for alignment"),
+            Movement(MovementType.CARTESIAN_MOVE, {'pitch': 1.5}, "Adjust pitch for return"),
+            Movement(MovementType.WAIT, {'duration': 1.5}, "Wait for pitch"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_GRASP}, "Rotate wrist for return"),
+            Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for rotation"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': GRIPPER_LOWER_DISTANCE}, "Lower to return position"),
+            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait before releasing"),
+            Movement(MovementType.GRIPPER_ACTION, {'action': 'release'}, "Release bottle opener"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': RAISE_DISTANCE}, "Raise after return"),
+            Movement(MovementType.WAIT, {'duration': 1.5}, "Wait after return")
+        ])
         
         return {
             "pickup_opener": pickup_opener_sequence,
