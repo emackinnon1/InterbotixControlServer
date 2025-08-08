@@ -21,7 +21,7 @@ class BeerBrandEnum(Enum):
 
 class StartBeerOpenerRequest(BaseModel):
     brand: BeerBrandEnum
-    wait_time: float = 2.0
+    wait_time: float = 2.5
 
 @state_machine_router.get("/status")
 def get_state_machine_status(
