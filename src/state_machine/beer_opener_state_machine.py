@@ -118,7 +118,11 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             
         return MovementSequence("open_bottle", [
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': waist_rotation}, "Position opener on bottle cap"),
-            # ... rest of movements
+            Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for positioning"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.5}, "Rotate wrist to open"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE}, "Raise while opening"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': 1.5}, "Complete opening motion"),
+            Movement(MovementType.WAIT, {'duration': 0.5}, "Wait for opening completion")
         ])
     
     def _process_current_state(self) -> bool:
