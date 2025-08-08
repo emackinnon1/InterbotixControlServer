@@ -71,8 +71,9 @@ def open_bottle(bot: InterbotixManipulatorXS, brand: str):
     print("open bottle 4: lower end effector")
     time.sleep(5)
     # get correct waist rotation
-    waist_rotation_config = BRAND_CONFIGS.get(brand, BRAND_CONFIGS["sapporo"]["waist_rotation"])  # default to sapporo
-    bot.arm.set_single_joint_position(joint_name='waist', position=waist_rotation_config) # 5 for sapporo beer
+    waist_rotation_config = BRAND_CONFIGS.get(brand, {}).get("waist_rotation")
+    bot.arm.set_single_joint_position(joint_name='waist', position=waist_rotation_config)
+    
     print("open bottle 5: bottle opener in place")
     time.sleep(2.5)
     bot.arm.set_single_joint_position(joint_name='wrist_rotate', position=np.pi/1.2, moving_time=0.5)
@@ -94,6 +95,7 @@ def open_beer(brand: str):
 
     robot_startup()
     # bot.gripper.set_pressure(1.0)
+    bot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
     
 
     # bot.arm.go_to_home_pose()
@@ -102,8 +104,10 @@ def open_beer(brand: str):
     bottle_opener(bot, True)
     
     bot.arm.go_to_home_pose()
-    bot.arm.go_to_sleep_pose()
 
+    bot.arm.go_to_sleep_pose()
+    time.sleep(0.5)
+    bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
     robot_shutdown()
 
 
