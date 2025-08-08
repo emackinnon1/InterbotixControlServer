@@ -51,3 +51,14 @@ on_exit=Shutdown() # Try shutting down on exit
 ```bash
 colcon build --packages-select interbotix_xsarm_control
 ```
+
+
+Commands to remember:
+```bash
+# launch
+ros2 launch interbotix_xsarm_control xsarm_control.launch.py robot_model:=wx250 use_sim:=true
+# run script
+python3 /home/emackinnon1/InterbotixControlServer/src/interbotix_ros_manipulators/interbotix_ros_xsarms/interbotix_xsarm_control/scripts/open_beer.py
+# disable/enable torque
+ros2 service call /wx250/torque_enable interbotix_xs_msgs/srv/TorqueEnable "{cmd_type: 'group', name: 'all', enable: true}"
+```
