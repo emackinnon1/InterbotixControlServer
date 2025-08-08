@@ -53,7 +53,6 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         return BeerOpenerState.ERROR
     
     def _create_sequences(self) -> Dict[str, MovementSequence]:
-        # Your existing sequence creation logic here
         pickup_opener_sequence = MovementSequence("pickup_opener", [
             Movement(MovementType.GRIPPER_ACTION, {'action': 'release'}, "Release gripper"),
             Movement(MovementType.GO_HOME, {'moving_time': 1.75}, "Go to home pose"),
@@ -73,7 +72,6 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             Movement(MovementType.WAIT, {'duration': 1.5}, "Wait after pickup")
         ])
         
-                
         approach_bottle_sequence = MovementSequence("approach_bottle", [
             Movement(MovementType.GO_HOME, {}, "Go to home pose"),
             Movement(MovementType.POSE_COMPONENTS, {'x': 0.21, 'z': 0.35}, "Move to bottle approach position"),
@@ -156,5 +154,25 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
                 return False
             if self.current_sequence.is_complete():
                 self.state = BeerOpenerState.COMPLETE
+                self.current_sequence = None
                 
         return True
+
+def open_beer_state_machine(brand: str, wait_time: float = 2.0):
+    """Main function to open a beer bottle using the abstract state machine"""
+    from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+    
+    bot = InterbotixManipulatorXS(
+        robot_model='wx250',
+        group_name='arm',
+        gripper_name='gripper',
+        moving_time=1.5,
+        gripper_pressure=0.85           
+    )
+
+    # Create and run state machine with robot management
+    state_machine = BeerOpenerStateMachine(bot, brand, wait_time)
+    return state_machine.run_with_robot_management()
+
+if __name__ == '__main__':
+    open_beer_state_machine("heineken")
