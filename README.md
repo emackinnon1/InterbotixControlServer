@@ -50,6 +50,9 @@ on_exit=Shutdown() # Try shutting down on exit
 
 ```bash
 colcon build --packages-select interbotix_xsarm_control
+# or
+colcon build --paths interbotix_ws/src/interbotix_ros_manipulators/interbotix_ros_xsarms/interbotix_xsarm_control
+colcon build --paths InterbotixControlServer/src/interbotix_ros_manipulators/interbotix_ros_xsarms/interbotix_xsarm_control
 ```
 
 
