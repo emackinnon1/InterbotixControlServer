@@ -41,11 +41,12 @@ WARNING: Be aware that are nodes in the graph that share an exact name, this can
 /wx250/xs_sdk
 ```
 
-Will need to rebuild the interbotix_xsarm_control package if adding 
+Will need to rebuild the interbotix_xsarm_control package if attempting to add Shutdown back on line 105 in `install/interbotix_xsarm_control/share/interbotix_xsarm_control/launch/xsarm_control.launch.py`
 ```python
+from launch.actions import Shutdown
+
 on_exit=Shutdown() # Try shutting down on exit
 ```
-back on line 105 in `install/interbotix_xsarm_control/share/interbotix_xsarm_control/launch/xsarm_control.launch.py`
 
 ```bash
 colcon build --packages-select interbotix_xsarm_control
