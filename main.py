@@ -18,6 +18,6 @@ def read_root():
 # Cleanup on shutdown
 @app.on_event("shutdown")
 def shutdown_event():
-    from src.services.state_machine_manager import StateMachineManager
+    from src.state_machine.state_machine_manager import StateMachineManager
     manager = StateMachineManager()
     manager.cleanup()
