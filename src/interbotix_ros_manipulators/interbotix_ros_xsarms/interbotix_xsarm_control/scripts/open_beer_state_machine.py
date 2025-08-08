@@ -76,8 +76,9 @@ class MovementSequence:
         self.current_step = 0
 
 class MovementExecutor:
-    def __init__(self, bot: InterbotixManipulatorXS):
+    def __init__(self, bot: InterbotixManipulatorXS, default_wait_time: float = 2.0):
         self.bot = bot
+        self.default_wait_time = default_wait_time
         
     def execute_movement(self, movement: Movement) -> bool:
         """Execute a single movement and return success status"""
@@ -105,7 +106,10 @@ class MovementExecutor:
                     
             elif movement.type == MovementType.WAIT:
                 time.sleep(movement.params.get('duration', 1.0))
-                
+                return True  # Return early for WAIT movements to avoid double waiting
+            
+            # Add automatic wait after all non-WAIT movements
+            time.sleep(self.default_wait_time)
             return True
             
         except Exception as e:
@@ -113,11 +117,11 @@ class MovementExecutor:
             return False
 
 class BeerOpenerStateMachine:
-    def __init__(self, bot: InterbotixManipulatorXS, brand: str):
+    def __init__(self, bot: InterbotixManipulatorXS, brand: str, default_wait_time: float = 2.0):
         self.bot = bot
         self.brand = brand
         self.state = BeerOpenerState.INIT
-        self.executor = MovementExecutor(bot)
+        self.executor = MovementExecutor(bot, default_wait_time)
         self.current_sequence: Optional[MovementSequence] = None
         
         # Define movement sequences
@@ -258,7 +262,7 @@ class BeerOpenerStateMachine:
             
         return success
 
-def open_beer_state_machine(brand: str):
+def open_beer_state_machine(brand: str, wait_time: float = 2.0):
     """Main function to open a beer bottle"""
     bot = InterbotixManipulatorXS(
         robot_model='wx250',
@@ -273,7 +277,7 @@ def open_beer_state_machine(brand: str):
         bot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
         
         # Create and run state machine
-        state_machine = BeerOpenerStateMachine(bot, brand)
+        state_machine = BeerOpenerStateMachine(bot, brand, wait_time)
         success = state_machine.run()
         
         if success:
