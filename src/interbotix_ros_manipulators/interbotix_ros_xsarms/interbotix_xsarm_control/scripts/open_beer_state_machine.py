@@ -76,7 +76,7 @@ class MovementSequence:
         self.current_step = 0
 
 class MovementExecutor:
-    def __init__(self, bot: InterbotixManipulatorXS, default_wait_time: float = 2.0):
+    def __init__(self, bot: InterbotixManipulatorXS, default_wait_time: float = 2.5):
         self.bot = bot
         self.default_wait_time = default_wait_time
         
@@ -117,7 +117,7 @@ class MovementExecutor:
             return False
 
 class BeerOpenerStateMachine:
-    def __init__(self, bot: InterbotixManipulatorXS, brand: str, default_wait_time: float = 2.0):
+    def __init__(self, bot: InterbotixManipulatorXS, brand: str, default_wait_time: float = 2.5):
         self.bot = bot
         self.brand = brand
         self.state = BeerOpenerState.INIT
@@ -262,7 +262,7 @@ class BeerOpenerStateMachine:
             
         return success
 
-def open_beer_state_machine(brand: str, wait_time: float = 2.0):
+def open_beer_state_machine(brand: str, wait_time: float = 2.5):
     """Main function to open a beer bottle"""
     bot = InterbotixManipulatorXS(
         robot_model='wx250',
