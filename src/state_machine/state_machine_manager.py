@@ -59,9 +59,7 @@ class StateMachineManager:
                 moving_time=1.5,
                 gripper_pressure=0.85
             )
-            
             robot_startup()
-            self._robot_bot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
             
             return True
             
@@ -150,7 +148,7 @@ class StateMachineManager:
     def _execute_state_machine(self):
         """Execute the state machine (runs in separate thread)"""
         try:
-            success = self._current_state_machine.run()
+            success = self._current_state_machine.run_with_robot_management()
             
             self._status.is_running = False
             self._status.end_time = datetime.now()
