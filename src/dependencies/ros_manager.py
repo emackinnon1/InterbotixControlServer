@@ -3,6 +3,7 @@ import subprocess
 import time
 import signal
 import os
+import logging
 from enum import Enum
 from typing import Optional, Tuple
 
@@ -22,6 +23,7 @@ class ROSLaunchManager:
     """
     
     def __init__(self, robot_model: str = "wx250"):
+        self.logger = logging.getLogger(__name__)
         self.robot_model = robot_model
         self.process: Optional[subprocess.Popen] = None
         self.status = ROSStatus.NOT_RUNNING
@@ -67,7 +69,9 @@ class ROSLaunchManager:
             return len(filtered_output) > 0
             
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
-            self.error_message = f"Failed to check ROS status: {str(e)}"
+            error_msg = f"Failed to check ROS status: {str(e)}"
+            self.logger.error(error_msg)
+            self.error_message = error_msg
             return False
     
     def start_ros_launch(self) -> bool:
@@ -78,12 +82,15 @@ class ROSLaunchManager:
             bool: True if process started successfully, False otherwise
         """
         if self.is_running():
-            self.error_message = "ROS launch process is already running"
+            error_msg = "ROS launch process is already running"
+            self.logger.error(error_msg)
+            self.error_message = error_msg
             return False
         
         try:
             self.status = ROSStatus.STARTING
             self.error_message = None
+            self.logger.info("Starting ROS launch process...")
             
             # Start the process in the background
             self.process = subprocess.Popen(
@@ -100,16 +107,21 @@ class ROSLaunchManager:
             # Check if process is still running (didn't immediately fail)
             if self.process.poll() is None:
                 self.status = ROSStatus.RUNNING
+                self.logger.info("ROS launch process started successfully")
                 return True
             else:
                 # Process failed to start
                 stdout, stderr = self.process.communicate()
-                self.error_message = f"Process failed to start. stderr: {stderr}"
+                error_msg = f"Process failed to start. stderr: {stderr}"
+                self.logger.error(error_msg)
+                self.error_message = error_msg
                 self.status = ROSStatus.ERROR
                 return False
                 
         except Exception as e:
-            self.error_message = f"Failed to start ROS launch: {str(e)}"
+            error_msg = f"Failed to start ROS launch: {str(e)}"
+            self.logger.error(error_msg)
+            self.error_message = error_msg
             self.status = ROSStatus.ERROR
             return False
     
@@ -123,6 +135,7 @@ class ROSLaunchManager:
         try:
             self.status = ROSStatus.STOPPING
             self.error_message = None
+            self.logger.info("Stopping ROS launch process...")
             
             # First, try to stop our managed process gracefully if it exists
             if self.process:
@@ -136,7 +149,9 @@ class ROSLaunchManager:
                     pass
                 except Exception as e:
                     # Log the error but continue with pkill approach
-                    self.error_message = f"Warning during process cleanup: {str(e)}"
+                    error_msg = f"Warning during process cleanup: {str(e)}"
+                    self.logger.warning(error_msg)
+                    self.error_message = error_msg
                 
                 self.process = None
             
@@ -154,18 +169,25 @@ class ROSLaunchManager:
                 # Give processes time to terminate
                 time.sleep(2)
                 self.status = ROSStatus.NOT_RUNNING
+                self.logger.info("ROS launch process stopped successfully")
                 return True
             else:
-                self.error_message = f"pkill failed with return code {result.returncode}: {result.stderr}"
+                error_msg = f"pkill failed with return code {result.returncode}: {result.stderr}"
+                self.logger.error(error_msg)
+                self.error_message = error_msg
                 self.status = ROSStatus.ERROR
                 return False
                 
         except subprocess.TimeoutExpired:
-            self.error_message = "Timeout while stopping ROS processes"
+            error_msg = "Timeout while stopping ROS processes"
+            self.logger.error(error_msg)
+            self.error_message = error_msg
             self.status = ROSStatus.ERROR
             return False
         except Exception as e:
-            self.error_message = f"Failed to stop ROS launch: {str(e)}"
+            error_msg = f"Failed to stop ROS launch: {str(e)}"
+            self.logger.error(error_msg)
+            self.error_message = error_msg
             self.status = ROSStatus.ERROR
             return False
     
@@ -191,11 +213,16 @@ class ROSLaunchManager:
                 # Process ended with error
                 try:
                     stdout, stderr = self.process.communicate()
-                    self.error_message = f"Process terminated with code {poll_result}. stderr: {stderr}"
+                    error_msg = f"Process terminated with code {poll_result}. stderr: {stderr}"
+                    self.logger.error(error_msg)
+                    self.error_message = error_msg
                 except:
-                    self.error_message = f"Process terminated with code {poll_result}"
+                    error_msg = f"Process terminated with code {poll_result}"
+                    self.logger.error(error_msg)
+                    self.error_message = error_msg
                 self.status = ROSStatus.ERROR
             else:
+                self.logger.info("ROS launch process terminated normally")
                 self.status = ROSStatus.NOT_RUNNING
             
             self.process = None
@@ -249,30 +276,3 @@ def get_ros_manager():
     if not hasattr(get_ros_manager, "_instance"):
         get_ros_manager._instance = ROSLaunchManager("wx250")
     return get_ros_manager._instance
-
-
-# Example usage
-if __name__ == "__main__":
-    # Create manager instance
-    ros_manager = ROSLaunchManager("wx250")
-    
-    # Check if ROS2 is already running
-    if ros_manager.check_ros2_running():
-        print("ROS2 processes detected")
-    else:
-        print("No ROS2 processes detected")
-    
-    # Start the ROS launch process
-    if ros_manager.start_ros_launch():
-        print("ROS launch started successfully")
-        
-        # Check status
-        status, error = ros_manager.get_status()
-        print(f"Status: {status.value}")
-        if error:
-            print(f"Error: {error}")
-    else:
-        print("Failed to start ROS launch")
-        status, error = ros_manager.get_status()
-        if error:
-            print(f"Error: {error}")
