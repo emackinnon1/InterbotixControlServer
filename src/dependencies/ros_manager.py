@@ -1,11 +1,12 @@
 # create dependency to double check ROS status before running commands
+import asyncio
 import subprocess
 import time
 import signal
 import os
 import logging
 from enum import Enum
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 
 class ROSStatus(Enum):
@@ -25,7 +26,7 @@ class ROSLaunchManager:
     def __init__(self, robot_model: str = "wx250"):
         self.logger = logging.getLogger(__name__)
         self.robot_model = robot_model
-        self.process: Optional[subprocess.Popen] = None
+        self.process: Optional[Union[subprocess.Popen, asyncio.subprocess.Process]] = None
         self.status = ROSStatus.NOT_RUNNING
         self.error_message: Optional[str] = None
         self.launch_command = [
@@ -37,7 +38,7 @@ class ROSLaunchManager:
         ]
         self.ros_root = "/opt/ros/humble"
     
-    def check_ros2_running(self) -> bool:
+    async def check_ros2_running(self) -> bool:
         """
         Check if ROS2 processes are currently running using ps aux.
         
@@ -45,36 +46,38 @@ class ROSLaunchManager:
             bool: True if ROS2 processes are found, False otherwise
         """
         try:
-            result = subprocess.run(
-                ["ps", "aux"], 
-                capture_output=True, 
-                text=True, 
-                timeout=10
+            # Use asyncio subprocess for non-blocking execution
+            process = await asyncio.create_subprocess_exec(
+                "ps", "aux",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
             )
+            stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=10)
             
             # Check for ROS-related processes
-            ros_processes = subprocess.run(
-                ["grep", "-i", "ros"],
-                input=result.stdout,
-                capture_output=True,
-                text=True
+            grep_process = await asyncio.create_subprocess_exec(
+                "grep", "-i", "ros",
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
             )
+            grep_stdout, grep_stderr = await grep_process.communicate(input=stdout)
             
             # Filter out this script's own process
             filtered_output = []
-            for line in ros_processes.stdout.splitlines():
+            for line in grep_stdout.decode().splitlines():
                 if "ros_manager.py" not in line and "grep -i ros" not in line:
                     filtered_output.append(line)
             
             return len(filtered_output) > 0
             
-        except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
+        except (asyncio.TimeoutError, Exception) as e:
             error_msg = f"Failed to check ROS status: {str(e)}"
             self.logger.error(error_msg)
             self.error_message = error_msg
             return False
     
-    def start_ros_launch(self) -> bool:
+    async def start_ros_launch(self) -> bool:
         """
         Start the ROS launch process in the background.
         
@@ -92,27 +95,26 @@ class ROSLaunchManager:
             self.error_message = None
             self.logger.info("Starting ROS launch process...")
             
-            # Start the process in the background
-            self.process = subprocess.Popen(
-                self.launch_command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
+            # Start the process in the background using asyncio
+            self.process = await asyncio.create_subprocess_exec(
+                *self.launch_command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
                 preexec_fn=os.setsid  # Create new process group
             )
             
             # Give it a moment to start
-            time.sleep(2)
+            await asyncio.sleep(2)
             
             # Check if process is still running (didn't immediately fail)
-            if self.process.poll() is None:
+            if self.process.returncode is None:
                 self.status = ROSStatus.RUNNING
                 self.logger.info("ROS launch process started successfully")
                 return True
             else:
                 # Process failed to start
-                stdout, stderr = self.process.communicate()
-                error_msg = f"Process failed to start. stderr: {stderr}"
+                stdout, stderr = await self.process.communicate()
+                error_msg = f"Process failed to start. stderr: {stderr.decode()}"
                 self.logger.error(error_msg)
                 self.error_message = error_msg
                 self.status = ROSStatus.ERROR
@@ -125,7 +127,7 @@ class ROSLaunchManager:
             self.status = ROSStatus.ERROR
             return False
     
-    def stop_ros_launch(self) -> bool:
+    async def stop_ros_launch(self) -> bool:
         """
         Stop the ROS launch process gracefully using pkill.
         
@@ -143,8 +145,8 @@ class ROSLaunchManager:
                     # Send SIGTERM to the process group
                     os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
                     # Wait briefly for graceful shutdown
-                    self.process.wait(timeout=3)
-                except (subprocess.TimeoutExpired, ProcessLookupError):
+                    await asyncio.wait_for(self.process.wait(), timeout=3)
+                except (asyncio.TimeoutError, ProcessLookupError):
                     # Process might already be gone, continue with pkill
                     pass
                 except Exception as e:
@@ -156,29 +158,29 @@ class ROSLaunchManager:
                 self.process = None
             
             # Use pkill to stop all ROS processes more efficiently
-            result = subprocess.run(
-                ["pkill", "-f", self.ros_root],
-                capture_output=True,
-                text=True,
-                timeout=10
+            pkill_process = await asyncio.create_subprocess_exec(
+                "pkill", "-f", self.ros_root,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
             )
+            stdout, stderr = await asyncio.wait_for(pkill_process.communicate(), timeout=10)
             
             # pkill returns 0 if processes were found and killed, 1 if no processes found
             # Both are considered success for our purposes
-            if result.returncode in [0, 1]:
+            if pkill_process.returncode in [0, 1]:
                 # Give processes time to terminate
-                time.sleep(2)
+                await asyncio.sleep(2)
                 self.status = ROSStatus.NOT_RUNNING
                 self.logger.info("ROS launch process stopped successfully")
                 return True
             else:
-                error_msg = f"pkill failed with return code {result.returncode}: {result.stderr}"
+                error_msg = f"pkill failed with return code {pkill_process.returncode}: {stderr.decode()}"
                 self.logger.error(error_msg)
                 self.error_message = error_msg
                 self.status = ROSStatus.ERROR
                 return False
                 
-        except subprocess.TimeoutExpired:
+        except asyncio.TimeoutError:
             error_msg = "Timeout while stopping ROS processes"
             self.logger.error(error_msg)
             self.error_message = error_msg
@@ -201,8 +203,12 @@ class ROSLaunchManager:
         if self.process is None:
             return False
         
-        # Check if process is still alive
-        poll_result = self.process.poll()
+        # Check if process is still alive - handle both sync and async processes
+        if isinstance(self.process, asyncio.subprocess.Process):
+            poll_result = self.process.returncode
+        else:
+            poll_result = self.process.poll()
+            
         if poll_result is None:
             # Process is still running
             self.status = ROSStatus.RUNNING
@@ -211,15 +217,9 @@ class ROSLaunchManager:
             # Process has terminated
             if poll_result != 0:
                 # Process ended with error
-                try:
-                    stdout, stderr = self.process.communicate()
-                    error_msg = f"Process terminated with code {poll_result}. stderr: {stderr}"
-                    self.logger.error(error_msg)
-                    self.error_message = error_msg
-                except:
-                    error_msg = f"Process terminated with code {poll_result}"
-                    self.logger.error(error_msg)
-                    self.error_message = error_msg
+                error_msg = f"Process terminated with code {poll_result}"
+                self.logger.error(error_msg)
+                self.error_message = error_msg
                 self.status = ROSStatus.ERROR
             else:
                 self.logger.info("ROS launch process terminated normally")
@@ -257,16 +257,16 @@ class ROSLaunchManager:
         except:
             return None, None
     
-    def restart(self) -> bool:
+    async def restart(self) -> bool:
         """
         Restart the ROS launch process.
         
         Returns:
             bool: True if restarted successfully, False otherwise
         """
-        self.stop_ros_launch()
-        time.sleep(2)  # Give it time to fully stop
-        return self.start_ros_launch()
+        await self.stop_ros_launch()
+        await asyncio.sleep(2)  # Give it time to fully stop
+        return await self.start_ros_launch()
 
 def get_ros_manager():
     """
