@@ -158,10 +158,10 @@ class AbstractStateMachine(Generic[StateType], ABC):
             return False
             
         finally:
-            # Always disable torque and shutdown
+            # Always reboot motors, disable torque and shutdown
             try:
+                self.bot.core.robot_reboot_motors(cmd_type='group', name='all', smart_reboot=True)
                 self.bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
-                # robot_shutdown()
             except Exception as e:
                 print(f"Error during robot shutdown: {e}")
     
