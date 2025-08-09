@@ -31,7 +31,7 @@ def get_state_machine_status(
     return manager.get_status()
 
 @state_machine_router.post("/beer-opener/start")
-def start_beer_opener(
+async def start_beer_opener(
     request: StartBeerOpenerRequest,
     manager: StateMachineManager = Depends(get_ready_state_machine_manager)
 ) -> Dict[str, str]:
@@ -56,7 +56,7 @@ def start_beer_opener(
     return {"message": f"Beer opener started for {request.brand.value}"}
 
 @state_machine_router.post("/stop")
-def stop_state_machine(
+async def stop_state_machine(
     manager: StateMachineManager = Depends(get_state_machine_manager)
 ) -> Dict[str, str]:
     """Stop the currently running state machine"""
@@ -76,7 +76,7 @@ def is_state_machine_ready(
     return {"ready": manager.is_ready()}
 
 @state_machine_router.post("/initialize")
-def initialize_robot(
+async def initialize_robot(
     manager: StateMachineManager = Depends(get_state_machine_manager),
     robot_model: str = "wx250"
 ) -> Dict[str, str]:
@@ -90,7 +90,7 @@ def initialize_robot(
     return {"message": "Robot initialized successfully"}
 
 @state_machine_router.post("/shutdown")
-def shutdown_robot(
+async def shutdown_robot(
     manager: StateMachineManager = Depends(get_state_machine_manager)
 ) -> Dict[str, str]:
     """Shutdown the robot connection"""
