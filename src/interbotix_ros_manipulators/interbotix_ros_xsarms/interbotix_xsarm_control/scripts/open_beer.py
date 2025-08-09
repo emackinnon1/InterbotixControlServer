@@ -18,8 +18,8 @@ BRAND_CONFIGS = {
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "corona": {
-        "waist_rotation": -np.pi/4.9,
-        "bottle_lower_distance": -0.18
+        "waist_rotation": -np.pi/4.75,
+        "bottle_lower_distance": -0.182
     }
 }
 
@@ -75,7 +75,9 @@ def open_bottle(bot: InterbotixManipulatorXS, brand: str):
     bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/5.65)
     print("open bottle 3: rotate waist")
     time.sleep(2.5)
-    bot.arm.set_ee_cartesian_trajectory(z=-0.2)
+
+    bottle_lower_distance = BRAND_CONFIGS.get(brand, {}).get("bottle_lower_distance")
+    bot.arm.set_ee_cartesian_trajectory(z=bottle_lower_distance)
     print("open bottle 4: lower end effector")
     time.sleep(5)
     # get correct waist rotation
@@ -120,4 +122,4 @@ def open_beer(brand: str):
 
 
 if __name__ == '__main__':
-    open_beer("heineken")
+    open_beer("corona")

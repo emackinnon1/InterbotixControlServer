@@ -30,8 +30,8 @@ BRAND_CONFIGS = {
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "corona": {
-        "waist_rotation": -np.pi/4.9,
-        "bottle_lower_distance": -0.175
+        "waist_rotation": -np.pi/4.7,
+        "bottle_lower_distance": -0.182
     }
 }
 
@@ -92,8 +92,8 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             
             # Step 4: Turn off torque
             try:
-                self.bot.core.robot_set_motor_torque_enable('group', 'arm', False)
-                self.bot.core.robot_set_motor_torque_enable('single', 'gripper', False)
+                self.bot.core.robot_reboot_motors(cmd_type='group', name='all', enable=False, smart_reboot=True)
+                self.bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
                 print("Torque disabled - arm is now safe")
                 return True
             except Exception as e:
@@ -160,17 +160,13 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
     
     def _create_open_bottle_sequence(self) -> MovementSequence:
         """Create brand-specific bottle opening sequence"""
-        print(f"DEBUG: self.brand = '{self.brand}' (type: {type(self.brand)})")
-        print(f"DEBUG: Available brands: {list(BRAND_CONFIGS.keys())}")
-        print(f"DEBUG: Brand comparison - 'corona' == self.brand: {'corona' == self.brand}")
-    
+
         brand_config = BRAND_CONFIGS.get(self.brand)
         if not brand_config:
             raise ValueError(f"Unknown brand: {self.brand}")
             
         waist_rotation = brand_config.get("waist_rotation")
         bottle_lower_distance = brand_config.get("bottle_lower_distance")
-        print(f"DEBUG: bottle_lower_distance {bottle_lower_distance}")
         
         if waist_rotation is None or bottle_lower_distance is None:
             raise ValueError(f"Incomplete configuration for brand: {self.brand}")
@@ -180,9 +176,9 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             Movement(MovementType.WAIT, {'duration': 2.0}, "Wait at bottle level"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': waist_rotation}, "Position opener on bottle cap"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for positioning"),
-            Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.5}, "Rotate wrist to open"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.3}, "Rotate wrist to open"),
             Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE}, "Raise while opening"),
-            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': 1.5}, "Complete opening motion"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': 1.25}, "Complete opening motion"),
             Movement(MovementType.WAIT, {'duration': 0.5}, "Wait for opening completion")
         ])
     
@@ -241,7 +237,7 @@ def open_beer_state_machine(brand: str, wait_time: float = 2.0):
         robot_model='wx250',
         group_name='arm',
         gripper_name='gripper',
-        moving_time=1.5,
+        moving_time=1.25,
         gripper_pressure=0.85           
     )
 
