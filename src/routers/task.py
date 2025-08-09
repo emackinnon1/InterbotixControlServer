@@ -17,6 +17,7 @@ class TasksEnum(Enum):
 class BeerBrandEnum(Enum):
     sapporo = "sapporo"
     heineken = "heineken"
+    corona = "corona"
 
 # Task function mapping
 TASK_FUNCTIONS = {

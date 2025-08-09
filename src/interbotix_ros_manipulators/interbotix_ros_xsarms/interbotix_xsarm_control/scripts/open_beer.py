@@ -4,14 +4,22 @@ from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_s
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 import numpy as np
 
+BOTTLE_LOWER_DISTANCE = -0.2
+
 # can add the unique "open_bottle" steps if more are needed depending on size of
 # other brands
 BRAND_CONFIGS = {
     "sapporo": {
-        "waist_rotation": -np.pi/5
+        "waist_rotation": -np.pi/5,
+        "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "heineken": {
-        "waist_rotation": -np.pi/4.75
+        "waist_rotation": -np.pi/4.75,
+        "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
+    },
+    "corona": {
+        "waist_rotation": -np.pi/4.9,
+        "bottle_lower_distance": -0.19
     }
 }
 

@@ -73,5 +73,5 @@ sudo lsof -t -i tcp:8000 | xargs kill -9
 
 Run prod server:
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+uv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```

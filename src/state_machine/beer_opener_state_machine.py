@@ -31,7 +31,7 @@ BRAND_CONFIGS = {
     },
     "corona": {
         "waist_rotation": -np.pi/4.9,
-        "bottle_lower_distance": -0.16
+        "bottle_lower_distance": -0.19
     }
 }
 
@@ -115,11 +115,12 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
     def _create_open_bottle_sequence(self) -> MovementSequence:
         """Create brand-specific bottle opening sequence"""
         waist_rotation = BRAND_CONFIGS.get(self.brand, {}).get("waist_rotation")
-        if not waist_rotation:
+        bottle_lower_distance = BRAND_CONFIGS.get(self.brand, {}).get("bottle_lower_distance")
+        if not waist_rotation or bottle_lower_distance:
             raise ValueError(f"Unknown brand: {self.brand}")
             
         return MovementSequence("open_bottle", [
-            Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_LOWER_DISTANCE}, "Lower to bottle level"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': bottle_lower_distance}, "Lower to bottle level"),
             Movement(MovementType.WAIT, {'duration': 2.0}, "Wait at bottle level"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': waist_rotation}, "Position opener on bottle cap"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for positioning"),
