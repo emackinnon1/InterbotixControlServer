@@ -26,7 +26,7 @@ TASK_FUNCTIONS = {
 }
 
 @tasks_router.post("/perform/{task_name}")
-def perform_task(
+async def perform_task(
     task_name: TasksEnum,
     beer_brand: BeerBrandEnum
 ):
