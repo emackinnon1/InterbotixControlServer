@@ -22,10 +22,16 @@ BOTTLE_RAISE_DISTANCE = 0.1
 
 BRAND_CONFIGS = {
     "sapporo": {
-        "waist_rotation": -np.pi/5
+        "waist_rotation": -np.pi/5,
+        "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "heineken": {
-        "waist_rotation": -np.pi/4.75
+        "waist_rotation": -np.pi/4.75,
+        "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
+    },
+    "corona": {
+        "waist_rotation": -np.pi/4.9,
+        "bottle_lower_distance": -0.16
     }
 }
 
@@ -80,8 +86,6 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION}, "Rotate waist to bottle"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for waist rotation"),
-            Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_LOWER_DISTANCE}, "Lower to bottle level"),
-            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait at bottle level")
         ])
         
         return_opener_sequence = MovementSequence("return_opener", [
@@ -115,6 +119,8 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             raise ValueError(f"Unknown brand: {self.brand}")
             
         return MovementSequence("open_bottle", [
+            Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_LOWER_DISTANCE}, "Lower to bottle level"),
+            Movement(MovementType.WAIT, {'duration': 2.0}, "Wait at bottle level"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': waist_rotation}, "Position opener on bottle cap"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for positioning"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.5}, "Rotate wrist to open"),

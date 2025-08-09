@@ -15,7 +15,10 @@ state_machine_router = APIRouter(
     tags=["state-machine"]
 )
 
+# TODO: make an experiment route that lets me pass in the movement sequences
+
 class BeerBrandEnum(Enum):
+    corona = "corona"
     sapporo = "sapporo"
     heineken = "heineken"
 
