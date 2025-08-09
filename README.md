@@ -65,3 +65,8 @@ python3 /home/emackinnon1/InterbotixControlServer/src/interbotix_ros_manipulator
 # disable/enable torque
 ros2 service call /wx250/torque_enable interbotix_xs_msgs/srv/TorqueEnable "{cmd_type: 'group', name: 'all', enable: true}"
 ```
+
+stopping fastapi when addr already in use
+```bash
+sudo lsof -t -i tcp:8000 | xargs kill -9
+```
