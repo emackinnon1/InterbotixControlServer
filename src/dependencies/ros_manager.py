@@ -25,12 +25,15 @@ class ROSLaunchManager:
     
     def __init__(self, robot_model: str = "wx250"):
         self.logger = logging.getLogger(__name__)
-        # self.logger = logging.getLogger("uvicorn")
         self.robot_model = robot_model
         self.process: Optional[Union[subprocess.Popen, asyncio.subprocess.Process]] = None
         self.status = ROSStatus.NOT_RUNNING
         self.error_message: Optional[str] = None
         self.streaming_task: Optional[asyncio.Task] = None  # Track streaming task
+        self.monitoring_task: Optional[asyncio.Task] = None  # Track monitoring task
+        self.monitoring_enabled: bool = False  # Control monitoring
+        self.last_known_status: ROSStatus = ROSStatus.NOT_RUNNING  # Track status changes
+        self.auto_restart_enabled: bool = True  # Enable automatic restart on failure
         self.launch_command = [
             "ros2",
             "launch", 
@@ -68,6 +71,50 @@ class ROSLaunchManager:
             stream_stderr(),
             return_exceptions=True
         )
+    
+    async def _monitor_process_health(self):
+        """
+        Background task to monitor ROS process health and log status changes.
+        Runs periodically while monitoring is enabled.
+        """
+        self.logger.info("Started ROS process health monitoring")
+        
+        while self.monitoring_enabled:
+            try:
+                # Check current process status
+                current_running = self.is_running()
+                current_status = self.status
+                
+                # Log status changes
+                if current_status != self.last_known_status:
+                    self.logger.info(f"ROS status changed from {self.last_known_status.value} to {current_status.value}")
+                    
+                    # Check if process failed unexpectedly and auto-restart is enabled
+                    if (current_status == ROSStatus.ERROR and 
+                        self.last_known_status == ROSStatus.RUNNING and
+                        self.auto_restart_enabled):
+                        self.logger.warning("ROS process failed unexpectedly, attempting automatic restart...")
+                        
+                        # Attempt to restart the process
+                        try:
+                            restart_success = await self.restart()
+                            if restart_success:
+                                self.logger.info("Automatic restart successful")
+                            else:
+                                self.logger.error("Automatic restart failed")
+                        except Exception as restart_error:
+                            self.logger.error(f"Error during automatic restart: {str(restart_error)}")
+                    
+                    self.last_known_status = current_status
+                
+                # Wait before next health check (every 5 seconds)
+                await asyncio.sleep(5)
+                
+            except Exception as e:
+                self.logger.error(f"Error during process health monitoring: {str(e)}")
+                await asyncio.sleep(5)  # Continue monitoring even after errors
+        
+        self.logger.info("Stopped ROS process health monitoring")
     
     async def check_ros2_running(self) -> bool:
         """
@@ -147,6 +194,13 @@ class ROSLaunchManager:
                     self._stream_process_output(self.process, "launch")
                 )
                 
+                # Start health monitoring in the background
+                self.monitoring_enabled = True
+                self.last_known_status = ROSStatus.RUNNING
+                self.monitoring_task = asyncio.create_task(
+                    self._monitor_process_health()
+                )
+                
                 return True
             else:
                 # Process failed to start
@@ -178,6 +232,16 @@ class ROSLaunchManager:
             
             # First, try to stop our managed process gracefully if it exists
             if self.process:
+                # Stop health monitoring
+                self.monitoring_enabled = False
+                if self.monitoring_task and not self.monitoring_task.done():
+                    self.monitoring_task.cancel()
+                    try:
+                        await self.monitoring_task
+                    except asyncio.CancelledError:
+                        pass
+                    self.monitoring_task = None
+                
                 # Cancel streaming task if it exists
                 if self.streaming_task and not self.streaming_task.done():
                     self.streaming_task.cancel()
