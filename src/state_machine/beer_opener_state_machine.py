@@ -31,7 +31,7 @@ BRAND_CONFIGS = {
     },
     "corona": {
         "waist_rotation": -np.pi/4.9,
-        "bottle_lower_distance": -0.19
+        "bottle_lower_distance": -0.18
     }
 }
 
