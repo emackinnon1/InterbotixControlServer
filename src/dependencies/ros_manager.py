@@ -34,6 +34,10 @@ class ROSLaunchManager:
         self.monitoring_enabled: bool = False  # Control monitoring
         self.last_known_status: ROSStatus = ROSStatus.NOT_RUNNING  # Track status changes
         self.auto_restart_enabled: bool = True  # Enable automatic restart on failure
+        self.critical_error_patterns = [
+            "FATAL", "ERROR", "FAILED", "ABORT", "CRITICAL", 
+            "SEGMENTATION FAULT", "CORE DUMPED", "EXCEPTION"
+        ]  # Patterns that indicate critical errors
         self.launch_command = [
             "ros2",
             "launch", 
@@ -42,6 +46,19 @@ class ROSLaunchManager:
             f"robot_model:={robot_model}"
         ]
         self.ros_root = "/opt/ros/humble"
+    
+    def _is_critical_error(self, stderr_line: str) -> bool:
+        """
+        Check if a stderr line contains critical error patterns.
+        
+        Args:
+            stderr_line: The stderr line to analyze
+            
+        Returns:
+            bool: True if the line contains a critical error pattern
+        """
+        stderr_upper = stderr_line.upper()
+        return any(pattern in stderr_upper for pattern in self.critical_error_patterns)
     
     async def _stream_process_output(self, process: asyncio.subprocess.Process, process_name: str):
         """
@@ -64,6 +81,12 @@ class ROSLaunchManager:
                     decoded_line = line.decode().strip()
                     if decoded_line:
                         self.logger.warning(f"ROS {process_name} stderr: {decoded_line}")
+                        
+                        # Check for critical errors and update status immediately
+                        if self._is_critical_error(decoded_line):
+                            self.logger.error(f"Critical error detected in ROS output: {decoded_line}")
+                            self.status = ROSStatus.ERROR
+                            self.error_message = f"Critical error from stderr: {decoded_line}"
         
         # Start both streaming tasks
         await asyncio.gather(
