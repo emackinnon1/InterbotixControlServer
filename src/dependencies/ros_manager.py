@@ -25,10 +25,12 @@ class ROSLaunchManager:
     
     def __init__(self, robot_model: str = "wx250"):
         self.logger = logging.getLogger(__name__)
+        # self.logger = logging.getLogger("uvicorn")
         self.robot_model = robot_model
         self.process: Optional[Union[subprocess.Popen, asyncio.subprocess.Process]] = None
         self.status = ROSStatus.NOT_RUNNING
         self.error_message: Optional[str] = None
+        self.streaming_task: Optional[asyncio.Task] = None  # Track streaming task
         self.launch_command = [
             "ros2",
             "launch", 
@@ -37,6 +39,35 @@ class ROSLaunchManager:
             f"robot_model:={robot_model}"
         ]
         self.ros_root = "/opt/ros/humble"
+    
+    async def _stream_process_output(self, process: asyncio.subprocess.Process, process_name: str):
+        """
+        Stream stdout and stderr from a process to logs in real-time.
+        
+        Args:
+            process: The asyncio subprocess to stream from
+            process_name: Name to use in log messages
+        """
+        async def stream_stdout():
+            if process.stdout:
+                async for line in process.stdout:
+                    decoded_line = line.decode().strip()
+                    if decoded_line:
+                        self.logger.info(f"ROS {process_name} stdout: {decoded_line}")
+        
+        async def stream_stderr():
+            if process.stderr:
+                async for line in process.stderr:
+                    decoded_line = line.decode().strip()
+                    if decoded_line:
+                        self.logger.warning(f"ROS {process_name} stderr: {decoded_line}")
+        
+        # Start both streaming tasks
+        await asyncio.gather(
+            stream_stdout(),
+            stream_stderr(),
+            return_exceptions=True
+        )
     
     async def check_ros2_running(self) -> bool:
         """
@@ -110,6 +141,12 @@ class ROSLaunchManager:
             if self.process.returncode is None:
                 self.status = ROSStatus.RUNNING
                 self.logger.info("ROS launch process started successfully")
+                
+                # Start streaming output in the background
+                self.streaming_task = asyncio.create_task(
+                    self._stream_process_output(self.process, "launch")
+                )
+                
                 return True
             else:
                 # Process failed to start
@@ -141,6 +178,15 @@ class ROSLaunchManager:
             
             # First, try to stop our managed process gracefully if it exists
             if self.process:
+                # Cancel streaming task if it exists
+                if self.streaming_task and not self.streaming_task.done():
+                    self.streaming_task.cancel()
+                    try:
+                        await self.streaming_task
+                    except asyncio.CancelledError:
+                        pass
+                    self.streaming_task = None
+                
                 try:
                     # Send SIGTERM to the process group
                     os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)

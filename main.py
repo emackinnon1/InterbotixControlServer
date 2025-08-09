@@ -1,8 +1,15 @@
+import logging
 from fastapi import FastAPI
 from src.routers.task import tasks_router
 from src.routers.arm import arm_router
 from src.routers.ros import ros_router
 from src.routers.state_machine import state_machine_router
+
+# Configure logging to show INFO level and above
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 app = FastAPI()
 
