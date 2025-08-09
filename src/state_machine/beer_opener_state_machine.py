@@ -31,7 +31,7 @@ BRAND_CONFIGS = {
     },
     "corona": {
         "waist_rotation": -np.pi/4.9,
-        "bottle_lower_distance": -0.18
+        "bottle_lower_distance": -0.175
     }
 }
 
@@ -57,6 +57,52 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
     
     def get_error_state(self) -> BeerOpenerState:
         return BeerOpenerState.ERROR
+    
+    def _safe_shutdown_sequence(self) -> bool:
+        """
+        Safely return arm to home, then sleep, then turn off torque.
+        Returns True if successful, False if any step fails.
+        """
+        try:
+            print("Error detected - initiating safe shutdown sequence...")
+            
+            # Step 1: Release gripper in case something is grasped
+            try:
+                self.bot.gripper.release()
+                print("Released gripper")
+                time.sleep(0.5)
+            except Exception as e:
+                print(f"Warning: Could not release gripper: {e}")
+            
+            # Step 2: Go to home position
+            try:
+                self.bot.arm.go_to_home_pose(moving_time=2.0)
+                print("Returned to home pose")
+                time.sleep(1.0)
+            except Exception as e:
+                print(f"Warning: Could not go to home pose: {e}")
+            
+            # Step 3: Go to sleep position
+            try:
+                self.bot.arm.go_to_sleep_pose(moving_time=2.0)
+                print("Moved to sleep pose")
+                time.sleep(1.0)
+            except Exception as e:
+                print(f"Warning: Could not go to sleep pose: {e}")
+            
+            # Step 4: Turn off torque
+            try:
+                self.bot.core.robot_set_motor_torque_enable('group', 'arm', False)
+                self.bot.core.robot_set_motor_torque_enable('single', 'gripper', False)
+                print("Torque disabled - arm is now safe")
+                return True
+            except Exception as e:
+                print(f"Warning: Could not disable torque: {e}")
+                return False
+                
+        except Exception as e:
+            print(f"Critical error during safe shutdown: {e}")
+            return False
     
     def _create_sequences(self) -> Dict[str, MovementSequence]:
         pickup_opener_sequence = MovementSequence("pickup_opener", [
@@ -114,10 +160,20 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
     
     def _create_open_bottle_sequence(self) -> MovementSequence:
         """Create brand-specific bottle opening sequence"""
-        waist_rotation = BRAND_CONFIGS.get(self.brand, {}).get("waist_rotation")
-        bottle_lower_distance = BRAND_CONFIGS.get(self.brand, {}).get("bottle_lower_distance")
-        if not waist_rotation or bottle_lower_distance:
+        print(f"DEBUG: self.brand = '{self.brand}' (type: {type(self.brand)})")
+        print(f"DEBUG: Available brands: {list(BRAND_CONFIGS.keys())}")
+        print(f"DEBUG: Brand comparison - 'corona' == self.brand: {'corona' == self.brand}")
+    
+        brand_config = BRAND_CONFIGS.get(self.brand)
+        if not brand_config:
             raise ValueError(f"Unknown brand: {self.brand}")
+            
+        waist_rotation = brand_config.get("waist_rotation")
+        bottle_lower_distance = brand_config.get("bottle_lower_distance")
+        print(f"DEBUG: bottle_lower_distance {bottle_lower_distance}")
+        
+        if waist_rotation is None or bottle_lower_distance is None:
+            raise ValueError(f"Incomplete configuration for brand: {self.brand}")
             
         return MovementSequence("open_bottle", [
             Movement(MovementType.CARTESIAN_MOVE, {'z': bottle_lower_distance}, "Lower to bottle level"),
@@ -132,38 +188,50 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
     
     def _process_current_state(self) -> bool:
         """Process the current state and advance if needed"""
-        if self.state == BeerOpenerState.INIT:
-            print("Starting beer opener sequence")
-            self._transition_to_sequence("pickup_opener", BeerOpenerState.PICKUP_OPENER)
+        try:
+            if self.state == BeerOpenerState.INIT:
+                print("Starting beer opener sequence")
+                self._transition_to_sequence("pickup_opener", BeerOpenerState.PICKUP_OPENER)
+                
+            elif self.state == BeerOpenerState.PICKUP_OPENER:
+                if not self._execute_current_sequence():
+                    return False
+                if self.current_sequence.is_complete():
+                    self._transition_to_sequence("approach_bottle", BeerOpenerState.APPROACH_BOTTLE)
+                    
+            elif self.state == BeerOpenerState.APPROACH_BOTTLE:
+                if not self._execute_current_sequence():
+                    return False
+                if self.current_sequence.is_complete():
+                    self.current_sequence = self._create_open_bottle_sequence()
+                    self.current_sequence.reset()
+                    self.state = BeerOpenerState.OPEN_BOTTLE
+                    
+            elif self.state == BeerOpenerState.OPEN_BOTTLE:
+                if not self._execute_current_sequence():
+                    return False
+                if self.current_sequence.is_complete():
+                    self._transition_to_sequence("return_opener", BeerOpenerState.RETURN_OPENER)
+                    
+            elif self.state == BeerOpenerState.RETURN_OPENER:
+                if not self._execute_current_sequence():
+                    return False
+                if self.current_sequence.is_complete():
+                    self.state = BeerOpenerState.COMPLETE
+                    self.current_sequence = None
+                    
+            elif self.state == BeerOpenerState.ERROR:
+                print("State machine in ERROR state - executing safe shutdown")
+                self._safe_shutdown_sequence()
+                return False  # Stop execution after error handling
+                    
+            return True
             
-        elif self.state == BeerOpenerState.PICKUP_OPENER:
-            if not self._execute_current_sequence():
-                return False
-            if self.current_sequence.is_complete():
-                self._transition_to_sequence("approach_bottle", BeerOpenerState.APPROACH_BOTTLE)
-                
-        elif self.state == BeerOpenerState.APPROACH_BOTTLE:
-            if not self._execute_current_sequence():
-                return False
-            if self.current_sequence.is_complete():
-                self.current_sequence = self._create_open_bottle_sequence()
-                self.current_sequence.reset()
-                self.state = BeerOpenerState.OPEN_BOTTLE
-                
-        elif self.state == BeerOpenerState.OPEN_BOTTLE:
-            if not self._execute_current_sequence():
-                return False
-            if self.current_sequence.is_complete():
-                self._transition_to_sequence("return_opener", BeerOpenerState.RETURN_OPENER)
-                
-        elif self.state == BeerOpenerState.RETURN_OPENER:
-            if not self._execute_current_sequence():
-                return False
-            if self.current_sequence.is_complete():
-                self.state = BeerOpenerState.COMPLETE
-                self.current_sequence = None
-                
-        return True
+        except Exception as e:
+            print(f"Error in state machine: {e}")
+            self.state = BeerOpenerState.ERROR
+            self._safe_shutdown_sequence()
+            return False
 
 def open_beer_state_machine(brand: str, wait_time: float = 2.0):
     """Main function to open a beer bottle using the abstract state machine"""
