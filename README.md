@@ -69,6 +69,10 @@ ros2 service call /wx250/torque_enable interbotix_xs_msgs/srv/TorqueEnable "{cmd
 stopping fastapi when addr already in use
 ```bash
 sudo lsof -t -i tcp:8000 | xargs kill -9
+
+# or...
+ps aux | grep uvicorn
+kill -SIGINT <PID>
 ```
 
 Run prod server:
