@@ -23,6 +23,7 @@ class Movement:
     params: Dict[str, Any]
     description: str
     timeout: float = 10.0
+    skip_default_wait: bool = False
 
 class MovementSequence:
     def __init__(self, name: str, movements: List[Movement]):
@@ -78,8 +79,9 @@ class MovementExecutor:
                 time.sleep(movement.params.get('duration', 1.0))
                 return True  # Return early for WAIT movements to avoid double waiting
             
-            # Add automatic wait after all non-WAIT movements
-            time.sleep(self.default_wait_time)
+            # Add automatic wait only if not skipped and not a WAIT movement
+            if not movement.skip_default_wait:
+                time.sleep(self.default_wait_time)
             return True
             
         except Exception as e:
