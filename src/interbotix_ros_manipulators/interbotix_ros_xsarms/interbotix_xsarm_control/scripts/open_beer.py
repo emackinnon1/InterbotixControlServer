@@ -4,9 +4,27 @@ from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_s
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 import numpy as np
 
+BOTTLE_LOWER_DISTANCE = -0.2
+
+# can add the unique "open_bottle" steps if more are needed depending on size of
+# other brands
+BRAND_CONFIGS = {
+    "sapporo": {
+        "waist_rotation": -np.pi/5,
+        "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
+    },
+    "heineken": {
+        "waist_rotation": -np.pi/4.75,
+        "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
+    },
+    "corona": {
+        "waist_rotation": -np.pi/4.75,
+        "bottle_lower_distance": -0.182
+    }
+}
 
 
-def bottle_opener(bot, put_back):
+def bottle_opener(bot: InterbotixManipulatorXS, put_back: bool):
     if not put_back:
         bot.gripper.release()
     bot.arm.go_to_home_pose(moving_time=1.75)
@@ -42,7 +60,10 @@ def bottle_opener(bot, put_back):
     # bot.arm.go_to_home_pose()
 
 
-def open_bottle(bot):
+def open_bottle(bot: InterbotixManipulatorXS, brand: str):
+    if not brand:
+        print("BEER BRAND REQUIRED. REPLACING BOTTLE OPENER.")
+        return
     bot.arm.go_to_home_pose()
     # bot.gripper.grasp()
     bot.arm.set_ee_pose_components(x=0.21, z=0.35)
@@ -54,10 +75,15 @@ def open_bottle(bot):
     bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/5.65)
     print("open bottle 3: rotate waist")
     time.sleep(2.5)
-    bot.arm.set_ee_cartesian_trajectory(z=-0.2)
+
+    bottle_lower_distance = BRAND_CONFIGS.get(brand, {}).get("bottle_lower_distance")
+    bot.arm.set_ee_cartesian_trajectory(z=bottle_lower_distance)
     print("open bottle 4: lower end effector")
     time.sleep(5)
-    bot.arm.set_single_joint_position(joint_name='waist', position=-np.pi/4.7) # 5: sapporo
+    # get correct waist rotation
+    waist_rotation_config = BRAND_CONFIGS.get(brand, {}).get("waist_rotation")
+    bot.arm.set_single_joint_position(joint_name='waist', position=waist_rotation_config)
+    
     print("open bottle 5: bottle opener in place")
     time.sleep(2.5)
     bot.arm.set_single_joint_position(joint_name='wrist_rotate', position=np.pi/1.2, moving_time=0.5)
@@ -67,9 +93,7 @@ def open_bottle(bot):
     bot.arm.go_to_home_pose(moving_time=1.75)
 
 
-
-
-def main():
+def open_beer(brand: str):
 
     bot = InterbotixManipulatorXS(
         robot_model='wx250',
@@ -81,18 +105,21 @@ def main():
 
     robot_startup()
     # bot.gripper.set_pressure(1.0)
+    bot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
     
 
     # bot.arm.go_to_home_pose()
     bottle_opener(bot, False)
-    open_bottle(bot)
+    open_bottle(bot, brand)
     bottle_opener(bot, True)
     
     bot.arm.go_to_home_pose()
-    bot.arm.go_to_sleep_pose()
 
+    bot.arm.go_to_sleep_pose()
+    time.sleep(0.5)
+    bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
     robot_shutdown()
 
 
 if __name__ == '__main__':
-    main()
+    open_beer("corona")

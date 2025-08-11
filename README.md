@@ -41,11 +41,41 @@ WARNING: Be aware that are nodes in the graph that share an exact name, this can
 /wx250/xs_sdk
 ```
 
-Will need to rebuild the interbotix_xsarm_control package if adding 
+Will need to rebuild the interbotix_xsarm_control package if attempting to add Shutdown back on line 105 in `install/interbotix_xsarm_control/share/interbotix_xsarm_control/launch/xsarm_control.launch.py`
 ```python
+from launch.actions import Shutdown
+
 on_exit=Shutdown() # Try shutting down on exit
 ```
-back on line 105 in `install/interbotix_xsarm_control/share/interbotix_xsarm_control/launch/xsarm_control.launch.py`
+
 ```bash
 colcon build --packages-select interbotix_xsarm_control
+# or
+colcon build --paths interbotix_ws/src/interbotix_ros_manipulators/interbotix_ros_xsarms/interbotix_xsarm_control
+colcon build --paths InterbotixControlServer/src/interbotix_ros_manipulators/interbotix_ros_xsarms/interbotix_xsarm_control
+```
+
+
+Commands to remember:
+```bash
+# launch
+ros2 launch interbotix_xsarm_control xsarm_control.launch.py robot_model:=wx250 use_sim:=true
+# run script
+python3 /home/emackinnon1/InterbotixControlServer/src/interbotix_ros_manipulators/interbotix_ros_xsarms/interbotix_xsarm_control/scripts/open_beer.py
+# disable/enable torque
+ros2 service call /wx250/torque_enable interbotix_xs_msgs/srv/TorqueEnable "{cmd_type: 'group', name: 'all', enable: true}"
+```
+
+stopping fastapi when addr already in use
+```bash
+sudo lsof -t -i tcp:8000 | xargs kill -9
+
+# or...
+ps aux | grep uvicorn
+kill -SIGINT <PID>
+```
+
+Run prod server:
+```bash
+uv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
