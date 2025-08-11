@@ -14,18 +14,11 @@ arm_router = APIRouter(
   tags=["arm"]
 )
 
-# bot = InterbotixManipulatorXS(
-#   robot_model='wx250',
-#   group_name='arm',
-#   gripper_name='gripper',
-#   moving_time=1.5,
-#   gripper_pressure=0.85           
-# )
-
 @arm_router.get("/position")
 async def arm_position():
   return {"joint_1": 2}
 
+# TODO: change this route to state machine and use state machine to control torque
 @arm_router.get("/torque/{desired_state}")
 async def torque(desired_state: TorqueStateEnum):
   """
