@@ -79,6 +79,7 @@ class MovementExecutor:
                 time.sleep(movement.params.get('duration', 1.0))
                 return True  # Return early for WAIT movements to avoid double waiting
             
+            # TODO: may need to revisit the wait logic to reduce total time it takes to run through process.
             # Add automatic wait only if not skipped and not a WAIT movement
             if not movement.skip_default_wait and movement.type != MovementType.WAIT:
                 time.sleep(self.default_wait_time)
