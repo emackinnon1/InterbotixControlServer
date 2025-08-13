@@ -80,7 +80,7 @@ class MovementExecutor:
                 return True  # Return early for WAIT movements to avoid double waiting
             
             # Add automatic wait only if not skipped and not a WAIT movement
-            if not movement.skip_default_wait:
+            if not movement.skip_default_wait and movement.type != MovementType.WAIT:
                 time.sleep(self.default_wait_time)
             return True
             
