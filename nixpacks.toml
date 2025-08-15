@@ -1,0 +1,2 @@
+[start]
+cmd = "make start_prod"
