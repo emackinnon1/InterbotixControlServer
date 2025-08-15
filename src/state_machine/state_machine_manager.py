@@ -56,7 +56,7 @@ class StateMachineManager:
                 robot_model=robot_model,
                 group_name='arm',
                 gripper_name='gripper',
-                moving_time=1.5,
+                moving_time=1.25,
                 gripper_pressure=0.85
             )
             robot_startup()

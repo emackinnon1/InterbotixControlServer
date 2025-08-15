@@ -16,7 +16,7 @@ state_machine_router = APIRouter(
 )
 
 # TODO: make an experiment route that lets me pass in the movement sequences
-
+# TODO: create a method to control torque and add it as a state. Should also check torque state before every process.
 class BeerBrandEnum(Enum):
     corona = "corona"
     sapporo = "sapporo"

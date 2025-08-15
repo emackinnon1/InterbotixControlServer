@@ -107,7 +107,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
     def _create_sequences(self) -> Dict[str, MovementSequence]:
         pickup_opener_sequence = MovementSequence("pickup_opener", [
             Movement(MovementType.GRIPPER_ACTION, {'action': 'release'}, "Release gripper"),
-            Movement(MovementType.GO_HOME, {'moving_time': 1.75}, "Go to home pose"),
+            Movement(MovementType.GO_HOME, {'moving_time': 1.25}, "Go to home pose"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_PICKUP_POSITION}, "Rotate to pickup position"),
             Movement(MovementType.CARTESIAN_MOVE, {'z': LOWER_DISTANCE, 'x': REVERSE_DISTANCE}, "Lower and move to opener"),
             Movement(MovementType.WAIT, {'duration': 2.0}, "Wait for stabilization"),
@@ -135,7 +135,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         ])
         
         return_opener_sequence = MovementSequence("return_opener", [
-            Movement(MovementType.GO_HOME, {'moving_time': 1.75}, "Go to home pose"),
+            Movement(MovementType.GO_HOME, {'moving_time': 1.25}, "Go to home pose"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_PICKUP_POSITION}, "Rotate to return position"),
             Movement(MovementType.CARTESIAN_MOVE, {'z': LOWER_DISTANCE, 'x': REVERSE_DISTANCE}, "Lower to return opener"),
             Movement(MovementType.WAIT, {'duration': 2.0}, "Wait for positioning"),
