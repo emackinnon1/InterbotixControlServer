@@ -1,2 +1,5 @@
+[build]
+cmd = "uv sync"
+
 [start]
-cmd = "make start_prod"
+cmd = "uv run uvicorn main:app --host 0.0.0.0 --port 8000"
