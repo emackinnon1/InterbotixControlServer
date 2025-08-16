@@ -1,67 +1,26 @@
-FROM ghcr.io/sloretz/ros:humble-ros-base
+FROM ghcr.io/sloretz/ros:humble-desktop-full
 
-COPY install/ /opt/ros/humble/install/
-COPY src/ /opt/ros/humble/src/
+COPY --from=ghcr.io/astral-sh/uv:0.8.11 /uv /uvx /bin/
 
+WORKDIR /interbotix_ws
+COPY ./interbotix_ws/src ./src
+COPY ./interbotix_ws/install ./install
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3-rosdep \
-    python3-rosinstall \
-    python3-rosinstall-generator \
-    python3-wstool \
-    build-essential \
-    python3-colcon-common-extensions \
-    python3-pip \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# Build the workspace
+# RUN . /opt/ros/humble/setup.bash && \
+#     rosdep update && \
+#     rosdep install --from-paths src --ignore-src -r -y && \
+#     colcon build
 
-RUN pip3 install transforms3d modern_robotics
+# Add sourcing commands to .bashrc so they're available in interactive shells
+RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc && \
+    echo "source /interbotix_ws/install/setup.bash" >> /root/.bashrc
 
-RUN rosdep init || true && \
-    rosdep update --include-eol-distros
+SHELL ["/bin/bash", "-c"]
 
-# Copy and run the Interbotix setup script
-# COPY ros-pckg-install-script.sh /tmp/ros-pckg-install-script.sh
-# RUN chmod +x /tmp/ros-pckg-install-script.sh && \
-#     /tmp/ros-pckg-install-script.sh && \
-#     rm /tmp/ros-pckg-install-script.sh
+# RUN . /opt/ros/humble/setup.bash && \
+# RUN rosdep update && \ ### works inside interactive shell
+#     rosdep install --from-paths src --ignore-src --rosdistro humble -r -y  && \
+#     colcon build
 
-WORKDIR /ros_ws
-RUN mkdir src
-
-COPY . /ros_ws/src
-
-RUN . /opt/ros/humble/setup.bash
-
-# Install ROS dependencies
-RUN rosdep install --from-paths src --ignore-src -r -y
-
-# Install ROS dependencies and build
-RUN cd /opt/ros/humble && \
-    . /opt/ros/humble/setup.sh && \
-    rosdep install --from-paths src --ignore-src -r -y && \
-    colcon build
-
-# # Build the workspace using colcon
-# RUN colcon build --symlink-install
-
-# Install UV and your Python app dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
-
-# Download the latest installer
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-
-# Run the installer then remove it
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-
-# Ensure the installed binary is on the `PATH`
-ENV PATH="/root/.local/bin/:$PATH"
-
-ADD . /app
-
-WORKDIR /app
-RUN uv sync --locked
-
-CMD ["bash", "-c", ". /ros_ws/install/setup.bash && bash"]
-
-# CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/bin/bash"]
