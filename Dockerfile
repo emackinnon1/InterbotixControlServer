@@ -1,7 +1,8 @@
 FROM ghcr.io/sloretz/ros:humble-ros-base
 
-COPY install/ /opt/ros/workspace/install/
-COPY src/ /opt/ros/workspace/src/
+# COPY install/ /opt/ros/humble/install/
+# COPY src/ /opt/ros/humble/src/
+
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-rosdep \
@@ -15,10 +16,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy and run the Interbotix setup script
-COPY ros-pckg-install-script.sh /tmp/ros-pckg-install-script.sh
-RUN chmod +x /tmp/ros-pckg-install-script.sh && \
-    /tmp/ros-pckg-install-script.sh && \
-    rm /tmp/ros-pckg-install-script.sh
+# COPY ros-pckg-install-script.sh /tmp/ros-pckg-install-script.sh
+# RUN chmod +x /tmp/ros-pckg-install-script.sh && \
+#     /tmp/ros-pckg-install-script.sh && \
+#     rm /tmp/ros-pckg-install-script.sh
+
+WORKDIR /ros_ws
+RUN mkdir src
+
+COPY . /ros_ws/src
+
+RUN . /opt/ros/humble/setup.bash
+
+# Build the workspace using colcon
+RUN colcon build --symlink-install
 
 # Install UV and your Python app dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
@@ -37,4 +48,6 @@ ADD . /app
 WORKDIR /app
 RUN uv sync --locked
 
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["bash", "-c", ". /ros_ws/install/setup.bash && bash"]
+
+# CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
