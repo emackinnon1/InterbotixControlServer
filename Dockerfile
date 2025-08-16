@@ -15,6 +15,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install transforms3d modern_robotics
+
+RUN rosdep init || true && \
+    rosdep update --include-eol-distros
+
 # Copy and run the Interbotix setup script
 # COPY ros-pckg-install-script.sh /tmp/ros-pckg-install-script.sh
 # RUN chmod +x /tmp/ros-pckg-install-script.sh && \
@@ -28,8 +33,17 @@ COPY . /ros_ws/src
 
 RUN . /opt/ros/humble/setup.bash
 
-# Build the workspace using colcon
-RUN colcon build --symlink-install
+# Install ROS dependencies
+RUN rosdep install --from-paths src --ignore-src -r -y
+
+# Install ROS dependencies and build
+RUN cd /opt/ros/humble && \
+    . /opt/ros/humble/setup.sh && \
+    rosdep install --from-paths src --ignore-src -r -y && \
+    colcon build
+
+# # Build the workspace using colcon
+# RUN colcon build --symlink-install
 
 # Install UV and your Python app dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
