@@ -1,11 +1,22 @@
 services:
-  api:
+  interbotix-server:
+    container_name: interbotix-server
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    network_mode: host
     privileged: true
     devices:
       - "/dev/ttyUSB0:/dev/ttyUSB0"
       - "/dev/ttyACM0:/dev/ttyACM0"
+    volumes:
+      - "/dev:/dev"
+    environment:
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - PYTHONPATH=/opt/ros/workspace/install/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
