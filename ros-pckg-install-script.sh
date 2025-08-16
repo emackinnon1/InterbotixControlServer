@@ -22,7 +22,9 @@ apt-get install -yq \
   python3-wstool \
   build-essential \
   python3-colcon-common-extensions \
-  git
+  git \
+  ros-humble-ros-gz \
+  ros-humble-gazebo-ros-pkgs
 
 # Setup rosdep
 echo "Setting up rosdep..."
