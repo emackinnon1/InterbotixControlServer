@@ -1,7 +1,7 @@
 FROM ghcr.io/sloretz/ros:humble-ros-base
 
-# COPY install/ /opt/ros/humble/install/
-# COPY src/ /opt/ros/humble/src/
+COPY install/ /opt/ros/humble/install/
+COPY src/ /opt/ros/humble/src/
 
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
