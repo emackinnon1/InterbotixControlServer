@@ -1,9 +1,10 @@
 # FROM ubuntu:22.04
-FROM --platform=linux/arm64 ghcr.io/sloretz/ros:humble-desktop-full
-
+FROM --platform=linux/arm64/v8 ghcr.io/sloretz/ros:humble-desktop
+USER root
 # Install essential packages (from xsarm_rpi4_install.sh)
 RUN apt-get update && apt-get install -yq \
     curl \
+    ca-certificates \
     git \
     python3-pip \
     lsb-release \
@@ -30,25 +31,26 @@ RUN apt-get update && apt-get install -yq \
     python3-wstool \
     build-essential \
     python3-colcon-common-extensions \
-    curl \
-    ca-certificates \
+    git \
     && rm -rf /var/lib/apt/lists/*
+
 RUN rm /etc/ros/rosdep/sources.list.d/20-default.list
 RUN rosdep init
-RUN rosdep update --include-eol-distros
+RUN rosdep update --include-eol-distros --rosdistro humble
 RUN echo "ROSDEP VER"
 RUN rosdep --version
 
 # Create workspace directory
-WORKDIR /app
-RUN mkdir -p src
+WORKDIR /InterbotixControlServer
+# RUN mkdir -p src
+COPY . .
 
 # Clone the required repositories (from install_ros2 function)
-WORKDIR /app/src
-RUN git clone -b humble https://github.com/Interbotix/interbotix_ros_core.git && \
-    git clone -b humble https://github.com/Interbotix/interbotix_ros_manipulators.git && \
-    git clone -b humble https://github.com/Interbotix/interbotix_ros_toolboxes.git && \
-    git clone -b ros2 https://github.com/ros-planning/moveit_visual_tools.git
+WORKDIR /InterbotixControlServer/src
+# RUN git clone -b humble https://github.com/Interbotix/interbotix_ros_core.git && \
+#     git clone -b humble https://github.com/Interbotix/interbotix_ros_manipulators.git && \
+#     git clone -b humble https://github.com/Interbotix/interbotix_ros_toolboxes.git && \
+#     git clone -b ros2 https://github.com/ros-planning/moveit_visual_tools.git
 
 # Remove COLCON_IGNORE files (from install_ros2 function)
 RUN rm -f \
@@ -58,17 +60,15 @@ RUN rm -f \
       interbotix_ros_toolboxes/interbotix_rpi_toolbox/COLCON_IGNORE
 
 # Initialize git submodules (from install_ros2 function)
-WORKDIR /app/src/interbotix_ros_core
+WORKDIR /InterbotixControlServer/src/interbotix_ros_core
 RUN git submodule update --init interbotix_ros_xseries/dynamixel_workbench_toolbox && \
     git submodule update --init interbotix_ros_xseries/interbotix_xs_driver
 
 # Copy udev rules (from install_ros2 function)
-WORKDIR /app/src/interbotix_ros_core/interbotix_ros_xseries/interbotix_xs_sdk
+WORKDIR /InterbotixControlServer/src/interbotix_ros_core/interbotix_ros_xseries/interbotix_xs_sdk
 RUN cp 99-interbotix-udev.rules /etc/udev/rules.d/
-# RUN udevadm control --reload-rules && sudo udevadm trigger
-# Note: udevadm commands are skipped in Docker build as udev service is not running
 
-WORKDIR /app
+WORKDIR /InterbotixControlServer
 
 # Install known dependencies explicitly (conservative approach)
 # These were identified from the rosdep check output
@@ -104,19 +104,32 @@ RUN apt-get update && apt-get install -y \
     
     # Add sourcing commands to .bashrc so they're available in interactive shells
 RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc && \
-    echo "source /app/install/setup.bash" >> /root/.bashrc
+    echo "source /InterbotixControlServer/install/setup.bash" >> /root/.bashrc
     
-# SHELL ["/bin/bash", "-c"]
-RUN ls && echo "FUCK"
-RUN cd /app && rosdep install --from-paths src -r -y
+SHELL ["/bin/bash", "-c"]
+# Skip problematic packages that aren't essential for core functionality
+RUN rosdep install -ryi --from-paths src --skip-keys="interbotix_xsarm_perception gazebo_ros gazebo_ros2_control ros2controlcli"
 # Try to build the workspace (from install_ros2 function)
-# RUN . /opt/ros/humble/setup.bash && colcon build || echo "Build completed with some failures, continuing..."
+RUN . /opt/ros/humble/setup.bash && colcon build || echo "Build completed with some failures, continuing..."
 
-# ADD https://astral.sh/uv/install.sh /uv-installer.sh
+# Note: udevadm commands are skipped in Docker build as udev service is not running
+# RUN udevadm control --reload-rules && sudo udevadm trigger
 
-# RUN sh /uv-installer.sh && rm /uv-installer.sh
+# Install uv
+RUN pip install --no-cache-dir uv
 
-# # Ensure the installed binary is on the `PATH`
-# ENV PATH="/root/.local/bin/:$PATH"
+# Ensure the installed binary is on the `PATH`
+ENV PATH="/root/.local/bin/:/InterbotixControlServer/.venv/lib/python3.10/site-packages:$PATH"
+ENV UV_SYSTEM_PYTHON=1
+COPY ./scripts/start-commands.sh /scripts/start-commands.sh
+WORKDIR /InterbotixControlServer
+COPY . .
+RUN uv pip install --system -r pyproject.toml
 
-ENTRYPOINT ["/bin/bash"]
+# RUN uv sync
+RUN --mount=type=cache,target=/root/.cache/uv \
+  uv sync --frozen --no-install-project --no-dev
+EXPOSE 8000
+
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# ENTRYPOINT ["/bin/bash"]
