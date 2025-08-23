@@ -1,5 +1,6 @@
 # FROM ubuntu:22.04
-FROM --platform=linux/arm64/v8 ghcr.io/sloretz/ros:humble-desktop as base
+FROM --platform=linux/arm64 ghcr.io/sloretz/ros:humble-desktop-full
+# FROM --platform=linux/arm64 osrf/ros:humble-desktop
 USER root
 # Install essential packages (from xsarm_rpi4_install.sh)
 RUN apt-get update && apt-get install -yq \
@@ -67,6 +68,7 @@ RUN git submodule update --init interbotix_ros_xseries/dynamixel_workbench_toolb
 # Copy udev rules (from install_ros2 function)
 WORKDIR /InterbotixControlServer/src/interbotix_ros_core/interbotix_ros_xseries/interbotix_xs_sdk
 RUN cp 99-interbotix-udev.rules /etc/udev/rules.d/
+RUN /lib/systemd/systemd-udevd --daemon
 
 WORKDIR /InterbotixControlServer
 
@@ -112,12 +114,6 @@ RUN rosdep install -ryi --from-paths src --skip-keys="interbotix_xsarm_perceptio
 # Try to build the workspace (from install_ros2 function)
 RUN . /opt/ros/humble/setup.bash && colcon build || echo "Build completed with some failures, continuing..."
 
-# # Download the latest installer
-# ADD https://astral.sh/uv/install.sh /uv-installer.sh
-
-# # Run the installer then remove it
-# RUN sh /uv-installer.sh && rm /uv-installer.sh
-
 # Install uv via pip
 RUN pip3 install uv
 
@@ -128,7 +124,6 @@ WORKDIR /InterbotixControlServer
 COPY . .
 RUN uv pip install --system -r pyproject.toml
 RUN uv sync --compile-bytecode
-
 
 
 # Copy and make the start script executable
