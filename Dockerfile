@@ -1,5 +1,5 @@
 # FROM ubuntu:22.04
-FROM --platform=linux/arm64/v8 ghcr.io/sloretz/ros:humble-desktop
+FROM --platform=linux/arm64/v8 ghcr.io/sloretz/ros:humble-desktop as base
 USER root
 # Install essential packages (from xsarm_rpi4_install.sh)
 RUN apt-get update && apt-get install -yq \
@@ -112,24 +112,30 @@ RUN rosdep install -ryi --from-paths src --skip-keys="interbotix_xsarm_perceptio
 # Try to build the workspace (from install_ros2 function)
 RUN . /opt/ros/humble/setup.bash && colcon build || echo "Build completed with some failures, continuing..."
 
-# Note: udevadm commands are skipped in Docker build as udev service is not running
-# RUN udevadm control --reload-rules && sudo udevadm trigger
+# # Download the latest installer
+# ADD https://astral.sh/uv/install.sh /uv-installer.sh
 
-# Install uv
-RUN pip install --no-cache-dir uv
+# # Run the installer then remove it
+# RUN sh /uv-installer.sh && rm /uv-installer.sh
 
-# Ensure the installed binary is on the `PATH`
-ENV PATH="/root/.local/bin/:/InterbotixControlServer/.venv/lib/python3.10/site-packages:$PATH"
-ENV UV_SYSTEM_PYTHON=1
-COPY ./scripts/start-commands.sh /scripts/start-commands.sh
+# Install uv via pip
+RUN pip3 install uv
+
+# Add uv to PATH
+ENV PATH="/InterbotixControlServer/.venv/bin:/root/.cargo/bin:$PATH"
+
 WORKDIR /InterbotixControlServer
 COPY . .
 RUN uv pip install --system -r pyproject.toml
+RUN uv sync --compile-bytecode
 
-# RUN uv sync
-RUN --mount=type=cache,target=/root/.cache/uv \
-  uv sync --frozen --no-install-project --no-dev
+
+
+# Copy and make the start script executable
+COPY ./scripts/start-commands.sh /scripts/start-commands.sh
+RUN chmod +x /scripts/start-commands.sh
+
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-# ENTRYPOINT ["/bin/bash"]
+# Use the start script which handles udev and environment setup
+CMD ["/scripts/start-commands.sh"]
