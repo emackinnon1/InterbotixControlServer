@@ -28,33 +28,6 @@ RUN add-apt-repository universe && \
     apt-get update && \
     apt-get install -y \
         ros-humble-desktop \
-        ros-humble-moveit \
-        ros-humble-dynamixel-sdk \
-        ros-humble-xacro \
-        ros-humble-moveit-msgs \
-        ros-humble-moveit-ros-planning-interface \
-        ros-humble-controller-manager \
-        ros-humble-joint-trajectory-controller \
-        ros-humble-moveit-ros-move-group \
-        ros-humble-moveit-simple-controller-manager \
-        ros-humble-moveit-kinematics \
-        ros-humble-moveit-planners-ompl \
-        ros-humble-moveit-ros-visualization \
-        ros-humble-moveit-setup-assistant \
-        ros-humble-joint-state-publisher \
-        ros-humble-hardware-interface \
-        ros-humble-ros2-controllers \
-        ros-humble-ros-gz \
-        ros-humble-tf-transformations \
-        ros-humble-nav2-msgs \
-        ros-humble-joint-state-publisher-gui \
-        ros-humble-effort-controllers \
-        ros-humble-gz-ros2-control \
-        ros-humble-graph-msgs \
-        ros-humble-moveit-common \
-        ros-humble-moveit-core \
-        ros-humble-moveit-ros-planning \
-        ros-humble-rviz-visual-tools \
         && rm -rf /var/lib/apt/lists/*
 
 # Install ROS2 build tools
