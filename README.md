@@ -79,3 +79,13 @@ Run prod server:
 ```bash
 uv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
+
+If running on local network, add a Caddyfile with:
+
+```
+rpi4-widowx250.local {
+  reverse_proxy localhost:8000
+  tls internal
+}
+```
+
