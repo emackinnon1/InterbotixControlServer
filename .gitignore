@@ -6,3 +6,5 @@
 !duck_dunk.bag
 
 log/
+workspace/build/
+workspace/install/

@@ -10,7 +10,7 @@ services:
       - "/dev/ttyUSB0:/dev/ttyUSB0"
       - "/dev/ttyACM0:/dev/ttyACM0"
     volumes:
-      - "./src:/opt/interbotix_ws/src/app"  # Mount your application code
+      - ".:./InterbotixControlServer"  # Mount your application code
     environment:
       - ROS_DOMAIN_ID=0
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
