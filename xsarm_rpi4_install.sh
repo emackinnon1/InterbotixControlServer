@@ -164,80 +164,6 @@ function install_essential_packages() {
   fi
 }
 
-function install_ros1() {
-  # Install ROS 1
-  if [ "$(dpkg-query -W -f='${Status}' ros-"$ROS_DISTRO_TO_INSTALL"-desktop-full 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
-    echo -e "${GRN}Installing ROS 1 $ROS_DISTRO_TO_INSTALL desktop...${OFF}"
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-    sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-    curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-    sudo apt-get update
-    sudo apt-get install -yq ros-"$ROS_DISTRO_TO_INSTALL"-desktop-full
-    echo "source /opt/ros/$ROS_DISTRO_TO_INSTALL/setup.bash" >> ~/.bashrc
-  else
-    echo "ros-$ROS_DISTRO_TO_INSTALL-desktop-full is already installed!"
-  fi
-  source /opt/ros/"$ROS_DISTRO_TO_INSTALL"/setup.bash
-
-  # Install rosdep and other necessary tools
-  if [ $PY_VERSION == 2 ]; then
-    sudo apt-get install -yq        \
-      python-rosdep                 \
-      python-rosinstall             \
-      python-rosinstall-generator   \
-      python-wstool                 \
-      build-essential
-  elif [ $PY_VERSION == 3 ]; then
-    sudo apt-get install -yq        \
-      python3-rosdep                \
-      python3-rosinstall            \
-      python3-rosinstall-generator  \
-      python3-wstool                \
-      build-essential
-  fi
-
-  # Remove sources if they exist
-  if [ -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
-    sudo rm /etc/ros/rosdep/sources.list.d/20-default.list
-  fi
-
-  # Initialize rosdep sources
-  sudo rosdep init
-
-  # Update local rosdep database, including EoL distros
-  rosdep update --include-eol-distros
-
-  # Install Arm packages
-  if source /opt/ros/"$ROS_DISTRO_TO_INSTALL"/setup.bash 2>/dev/null && \
-     source "$INSTALL_PATH"/devel/setup.bash 2>/dev/null && \
-     rospack list | grep -q interbotix_;
-  then
-    echo "Interbotix Arm ROS packages already installed!"
-  else
-    cd "$INSTALL_PATH"/src
-    git clone -b "$ROS_DISTRO_TO_INSTALL" https://github.com/Interbotix/interbotix_ros_core.git
-    git clone -b "$ROS_DISTRO_TO_INSTALL" https://github.com/Interbotix/interbotix_ros_manipulators.git
-    git clone -b "$ROS_DISTRO_TO_INSTALL" https://github.com/Interbotix/interbotix_ros_toolboxes.git
-    rm interbotix_ros_core/interbotix_ros_xseries/CATKIN_IGNORE         \
-      interbotix_ros_manipulators/interbotix_ros_xsarms/CATKIN_IGNORE   \
-      interbotix_ros_toolboxes/interbotix_rpi_toolbox/CATKIN_IGNORE     \
-      interbotix_ros_toolboxes/interbotix_xs_toolbox/CATKIN_IGNORE      \
-      interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_moveit_interface/CATKIN_IGNORE
-    cd interbotix_ros_core/interbotix_ros_xseries/interbotix_xs_sdk
-    sudo cp 99-interbotix-udev.rules /etc/udev/rules.d/
-    sudo udevadm control --reload-rules && sudo udevadm trigger
-    cd "$INSTALL_PATH"
-    rosdep install --from-paths src --ignore-src -r -y
-    if catkin_make; then
-      echo -e "${GRN}${BOLD}Interbotix Arm ROS Packages built successfully!${NORM}${OFF}"
-      echo "source $INSTALL_PATH/devel/setup.bash" >> ~/.bashrc
-      source "$INSTALL_PATH"/devel/setup.bash
-    else
-      failed "Failed to build Interbotix Arm ROS Packages."
-    fi
-  fi
-}
-
 function install_ros2() {
   # Install ROS 2
   if [ "$(dpkg-query -W -f='${Status}' ros-"$ROS_DISTRO_TO_INSTALL"-desktop 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
@@ -461,9 +387,7 @@ mkdir -p "$INSTALL_PATH"/src
 
 shopt -s extglob
 
-if [[ $ROS_VERSION_TO_INSTALL == 1 ]]; then
-  install_ros1
-elif [[ $ROS_VERSION_TO_INSTALL == 2 ]]; then
+if [[ $ROS_VERSION_TO_INSTALL == 2 ]]; then
   install_ros2
 else
   failed "Something went wrong. ROS_VERSION_TO_INSTALL=$ROS_VERSION_TO_INSTALL."

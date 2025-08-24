@@ -1,8 +1,8 @@
 from enum import Enum
 
 from fastapi import APIRouter, Depends, HTTPException
-from src.interbotix_ros_manipulators.interbotix_ros_xsarms.interbotix_xsarm_control.scripts.open_beer import open_beer
-from src.interbotix_ros_manipulators.interbotix_ros_xsarms.interbotix_xsarm_control.scripts.open_beer_state_machine import open_beer_state_machine
+from workspace.src.interbotix_ros_manipulators.interbotix_ros_xsarms.interbotix_xsarm_control.scripts.open_beer import open_beer
+# from workspace.src.interbotix_ros_manipulators.interbotix_ros_xsarms.interbotix_xsarm_control.scripts.open_beer_state_machine import open_beer_state_machine
 
 tasks_router = APIRouter(
     prefix="/tasks",
@@ -12,7 +12,7 @@ tasks_router = APIRouter(
 
 class TasksEnum(Enum):
     open_beer_bottle = "open_beer_bottle"
-    open_beer_state_machine = "open_beer_state_machine"
+    # open_beer_state_machine = "open_beer_state_machine"
 
 class BeerBrandEnum(Enum):
     sapporo = "sapporo"
@@ -22,7 +22,7 @@ class BeerBrandEnum(Enum):
 # Task function mapping
 TASK_FUNCTIONS = {
     "open_beer_bottle": open_beer,
-    "open_beer_state_machine": open_beer_state_machine
+    # "open_beer_state_machine": open_beer_state_machine
 }
 
 @tasks_router.post("/perform/{task_name}")

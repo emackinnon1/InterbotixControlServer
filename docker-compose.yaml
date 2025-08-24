@@ -9,21 +9,13 @@ services:
     devices:
       - "/dev/ttyUSB0:/dev/ttyUSB0"
       - "/dev/ttyACM0:/dev/ttyACM0"
-    # volumes:
-      # - "/opt/ros/humble:/opt/ros/humble"
-      # - "./src:InterbotixControlServer/src"
-      # - "./install:/opt/ros/workspace/install"
-      # - "ros_build:/opt/ros/workspace/build"
-      # - "ros_log:/opt/ros/workspace/log"
+    volumes:
+      - "./src:/opt/interbotix_ws/src/app"  # Mount your application code
     environment:
       - ROS_DOMAIN_ID=0
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-      # - PYTHONPATH=/opt/ros/workspace/install/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages
+      - PYTHONPATH=/opt/interbotix_ws/install/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages
     restart: unless-stopped
     stdin_open: true
     tty: true
     platform: linux/arm64
-
-# volumes:
-#   ros_build:
-#   ros_log:
