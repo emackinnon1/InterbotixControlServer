@@ -1,9 +1,8 @@
 on:
   push:
-    branches: master
-  pull_requests:
-    branches: master
-
+    branches: [main]
+  pull_request:
+    branches: [main]
 
   workflow_dispatch:
 
@@ -19,3 +18,22 @@ jobs:
       
       - name: Deploy application
         run: make deploy
+        
+      - name: Verify deployment
+        run: |
+          echo "Waiting for services to start..."
+          sleep 5
+          echo "Checking if services are running..."
+          if pgrep -f "caddy" > /dev/null; then
+            echo "✓ Caddy is running"
+          else
+            echo "✗ Caddy is not running"
+            exit 1
+          fi
+          if pgrep -f "uvicorn main:app" > /dev/null; then
+            echo "✓ FastAPI (uvicorn) is running"
+          else
+            echo "✗ FastAPI (uvicorn) is not running"
+            exit 1
+          fi
+          echo "Deployment verification successful!"
