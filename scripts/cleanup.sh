@@ -20,4 +20,3 @@ rm -f /tmp/uvicorn.pid
 
 echo "Cleanup complete."
 
-echo "Cleanup complete."
