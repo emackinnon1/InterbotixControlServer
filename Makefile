@@ -8,11 +8,9 @@ deploy:
 	@uv sync
 	@echo "Starting services..."
 	@caddy start
-	@echo "Starting FastAPI in background..."
-	@nohup uv run uvicorn main:app --host 0.0.0.0 --port 8000 > /tmp/uvicorn.log 2>&1 &
-	@echo $$! > /tmp/uvicorn.pid
-	@sleep 2
-	@echo "Services started successfully in background"
+	@echo "Starting FastAPI daemon..."
+	@./scripts/start-uvicorn-daemon.sh
+	@echo "Services started successfully"
 
 start_prod:
 	@echo "Starting FastAPI and Caddy..."
