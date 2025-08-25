@@ -16,8 +16,6 @@ jobs:
       
       - name: Setup Python environment
         run: |
-          echo "Setting up Python virtual environment..."
-          uv venv
           echo "Installing dependencies..."
           uv sync
       
