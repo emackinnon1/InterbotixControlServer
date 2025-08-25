@@ -1,0 +1,44 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, ARM64, rpi4-widowx250]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy application
+        run: make deploy
+        
+      - name: Verify deployment
+        run: |
+          echo "Waiting for services to start..."
+          sleep 5
+          echo "Checking if services are running..."
+          if pgrep -f "caddy" > /dev/null; then
+            echo "✓ Caddy is running"
+          else
+            echo "✗ Caddy is not running"
+            exit 1
+          fi
+          if pgrep -f "uvicorn main:app" > /dev/null; then
+            echo "✓ FastAPI (uvicorn) is running"
+          else
+            echo "✗ FastAPI (uvicorn) is not running"
+            exit 1
+          fi
+          echo "Testing HTTP response..."
+          if curl -s -f http://localhost:8000/ > /dev/null; then
+            echo "✓ FastAPI is responding to HTTP requests"
+          else
+            echo "✗ FastAPI is not responding to HTTP requests"
+            exit 1
+          fi
+          echo "Deployment verification successful!"
