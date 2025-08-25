@@ -22,7 +22,7 @@ FOCAL_VALID_DISTROS=('noetic' 'galactic')
 JAMMY_VALID_DISTROS=('humble' 'rolling')
 
 NONINTERACTIVE=false
-INSTALL_PATH=~/interbotix_ws
+INSTALL_PATH=~/InterbotixControlServer/workspace
 DISTRO_SET_FROM_CL=false
 RUN_JOY_AT_BOOT=false
 
