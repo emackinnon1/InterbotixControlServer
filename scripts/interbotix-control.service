@@ -7,7 +7,10 @@ Type=simple
 WorkingDirectory=/home/emackinnon1/InterbotixControlServer
 Environment=PATH=/home/emackinnon1/InterbotixControlServer/.venv/bin:/snap/astral-uv/929/bin:/usr/local/bin:/usr/bin:/bin
 Environment=PYTHONPATH=/home/emackinnon1/InterbotixControlServer
-ExecStart=/snap/astral-uv/929/bin/uv run uvicorn main:app --host 0.0.0.0 --port 8000
+WorkingDirectory=%h/InterbotixControlServer
+Environment=PATH=%h/InterbotixControlServer/.venv/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=%h/InterbotixControlServer
+ExecStart=/snap/bin/uv run uvicorn main:app --host 0.0.0.0 --port 8000
 Restart=always
 RestartSec=3
 StandardOutput=journal
