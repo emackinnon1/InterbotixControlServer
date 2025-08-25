@@ -16,8 +16,27 @@ jobs:
       
       - name: Setup Python environment
         run: |
+          echo "Setting up Python virtual environment..."
+          uv venv --python 3.10
           echo "Installing dependencies..."
           uv sync
+          echo "Verifying installation..."
+          source .venv/bin/activate
+          pip list | grep -E "(interbotix|fastapi|uvicorn)" || echo "Some packages missing"
+      
+      - name: Setup ROS environment
+        run: |
+          echo "Checking ROS workspace..."
+          if [ ! -f workspace/install/setup.bash ]; then
+            echo "ROS workspace not found, running setup script..."
+            if [ -f xsarm_rpi4_install.sh ]; then
+              bash xsarm_rpi4_install.sh
+            else
+              echo "Warning: xsarm_rpi4_install.sh not found, ROS packages may not be available"
+            fi
+          else
+            echo "ROS workspace already exists"
+          fi
       
       - name: Deploy application
         run: ./scripts/deploy.sh
