@@ -1,22 +1,33 @@
 #!/bin/bash
 
-echo "Cleaning up any existing services and processes..."
+# Function to log with timestamp
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
 
-# Stop systemd service first
-echo "Stopping FastAPI systemd service..."
-systemctl --user stop interbotix-control.service 2>/dev/null || true
+log "Cleaning up existing services..."
 
-# Stop caddy gracefully first, then forcefully if needed
-echo "Stopping Caddy..."
-(timeout 3 caddy stop 2>/dev/null || pkill -9 caddy 2>/dev/null) || true
+# Stop systemd service if it exists
+if systemctl --user is-active --quiet interbotix-control.service 2>/dev/null; then
+    log "Stopping systemd service..."
+    systemctl --user stop interbotix-control.service || true
+fi
 
-# Stop any remaining uvicorn processes
-echo "Stopping any remaining uvicorn processes..."
+# Stop Caddy gracefully
+log "Stopping Caddy..."
+timeout 5 caddy stop 2>/dev/null || pkill -9 caddy 2>/dev/null || true
+
+# Stop any uvicorn processes
+log "Stopping uvicorn processes..."
 pkill -f "uvicorn main:app" 2>/dev/null || true
+pkill -f "uv run uvicorn" 2>/dev/null || true
 
 # Clean up PID files
-echo "Cleaning up PID files..."
-rm -f /tmp/uvicorn.pid
+log "Cleaning up PID files..."
+rm -f /tmp/uvicorn.pid /tmp/uvicorn_parent.pid
 
-echo "Cleanup complete."
+# Wait a moment for processes to fully terminate
+sleep 2
+
+log "Cleanup complete"
 
