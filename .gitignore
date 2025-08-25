@@ -1,7 +1,5 @@
 # Ignore build artifacts that may contain host-specific CMakeCache files
-build/
-install/
-log/
+workspace/
 
 # Ignore Python artifacts
 __pycache__/
