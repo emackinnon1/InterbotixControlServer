@@ -1,8 +1,8 @@
 from enum import Enum
 
 from fastapi import APIRouter, Depends, HTTPException
-from src.interbotix_ros_manipulators.interbotix_ros_xsarms.interbotix_xsarm_control.scripts.open_beer import open_beer
-from src.interbotix_ros_manipulators.interbotix_ros_xsarms.interbotix_xsarm_control.scripts.open_beer_state_machine import open_beer_state_machine
+from scripts.open_beer import open_beer
+from scripts.open_beer_state_machine import open_beer_state_machine
 
 tasks_router = APIRouter(
     prefix="/tasks",
