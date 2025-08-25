@@ -1,0 +1,30 @@
+# Ignore build artifacts that may contain host-specific CMakeCache files
+build/
+install/
+log/
+
+# Ignore Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore IDE files
+.vscode/
+*.swp
+*.swo
+
+# Ignore logs
+*.log
+
+# Ignore ros dirs
+**/interbotix_ros_core/
+**/interbotix_ros_manipulators/
+**/interbotix_ros_toolboxes/
+**/moveit_visual_tools/

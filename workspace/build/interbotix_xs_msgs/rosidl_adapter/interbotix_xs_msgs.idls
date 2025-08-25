@@ -1,0 +1,14 @@
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:msg/ArmJoy.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:msg/HexJoy.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:msg/JointGroupCommand.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:msg/JointSingleCommand.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:msg/JointTemps.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:msg/JointTrajectoryCommand.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:msg/LocobotJoy.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:msg/TurretJoy.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:srv/MotorGains.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:srv/OperatingModes.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:srv/Reboot.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:srv/RegisterValues.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:srv/RobotInfo.idl
+/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_xs_msgs/rosidl_adapter/interbotix_xs_msgs:srv/TorqueEnable.idl
