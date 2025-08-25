@@ -65,6 +65,11 @@ start_fastapi() {
             # Change to the correct directory
             cd /home/emackinnon1/InterbotixControlServer
             
+            # Source ROS environment if it exists
+            if [ -f workspace/install/setup.bash ]; then
+                source workspace/install/setup.bash
+            fi
+            
             # Start uvicorn and capture PID
             uv run uvicorn main:app --host 0.0.0.0 --port 8000 &
             echo $! > /tmp/uvicorn.pid
