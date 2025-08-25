@@ -9,7 +9,7 @@ deploy:
 	@echo "Starting services..."
 	@caddy start
 	@echo "Starting FastAPI in detached shell..."
-	@bash -c 'cd $(PWD) && exec setsid sh -c "exec uv run uvicorn main:app --host 0.0.0.0 --port 8000 > /tmp/uvicorn.log 2>&1 &" < /dev/null > /dev/null 2>&1 & echo $$! > /tmp/uvicorn_parent.pid'
+	@bash -c 'cd $(PWD) && exec setsid sh -c "exec uv run uvicorn main:app --host 0.0.0.0 --port 8000 & > /tmp/uvicorn.log 2>&1 &" < /dev/null > /dev/null 2>&1 & echo $$! > /tmp/uvicorn_parent.pid'
 	@sleep 3
 	@echo "Services started successfully"
 
@@ -17,7 +17,7 @@ start_prod:
 	@echo "Starting FastAPI and Caddy..."
 	@trap 'echo "Stopping services..."; make stop_prod 2>/dev/null || true' EXIT INT TERM; \
 	caddy start && \
-	uv run uvicorn main:app --host 0.0.0.0 --port 8000 --pid-file /tmp/uvicorn.pid & \
+	uv run nohup uvicorn main:app --host 0.0.0.0 --port 8000 --pid-file /tmp/uvicorn.pid & \
 	echo $$! > /tmp/uvicorn.pid && \
 	wait
 
