@@ -1,0 +1,44 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from interbotix_rpi_msgs/msg/PixelCommands.msg
+// generated code does not contain a copyright notice
+
+
+module interbotix_rpi_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "This message is used specifically in the interbotix_rpi_modules package" "\n"
+      "" "\n"
+      "Configure NeoPixel Leds on a Raspberry Pi")
+    struct PixelCommands {
+      @verbatim (language="comment", text=
+        "Either 'pulse', 'blink', 'brightness', or 'color'." "\n"
+        "Note that the 'pulse' and 'brightness' options will" "\n"
+        "affect all Leds even if 'set_all_leds' is set to False.")
+      string cmd_type;
+
+      @verbatim (language="comment", text=
+        "Set to True to configure all LEDs")
+      boolean set_all_leds;
+
+      @verbatim (language="comment", text=
+        "Index of NeoPixel to change (only considered if 'set_all_leds' is false)")
+      uint8 pixel;
+
+      @verbatim (language="comment", text=
+        "Value indicates Color to be used (HEX - RGB)")
+      uint32 color;
+
+      @verbatim (language="comment", text=
+        "Value indicates LED brightness level (0-255)")
+      uint8 brightness;
+
+      @verbatim (language="comment", text=
+        "time delay for blink or pulse (milliseconds)")
+      uint32 period;
+
+      @verbatim (language="comment", text=
+        "iterations = number of iterations for blink or pulse")
+      uint8 iterations;
+    };
+  };
+};

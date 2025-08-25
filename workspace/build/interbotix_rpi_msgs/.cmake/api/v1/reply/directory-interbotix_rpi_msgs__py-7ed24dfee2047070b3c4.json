@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "interbotix_rpi_msgs__py",
+		"source" : "/home/emackinnon1/InterbotixControlServer/workspace/build/interbotix_rpi_msgs/interbotix_rpi_msgs__py"
+	}
+}
