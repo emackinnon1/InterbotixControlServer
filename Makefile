@@ -3,8 +3,10 @@
 .PHONY: deploy
 
 deploy:
-	@echo "Deploying app: syncing dependencies and starting services..."
+	@echo "Deploying app: stopping existing services, syncing dependencies, and restarting..."
+	@make cleanup
 	@uv sync
+	@echo "Starting services..."
 	@caddy start
 	@echo "Starting FastAPI..."
 	@uv run uvicorn main:app --host 0.0.0.0 --port 8000
@@ -28,12 +30,7 @@ stop_prod:
 	@echo "Services stopped."
 
 cleanup:
-	@echo "Cleaning up any stuck processes..."
-	@caddy stop 2>/dev/null || true
-	@pkill -f "uvicorn main:app" 2>/dev/null || true
-	@pkill -f "caddy" 2>/dev/null || true
-	@rm -f /tmp/uvicorn.pid
-	@echo "Cleanup complete."
+	@./scripts/cleanup.sh
 
 start_runner:
 	@echo "Starting GH runner..."
