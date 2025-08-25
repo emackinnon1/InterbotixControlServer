@@ -1,0 +1,41 @@
+INFO:     Started server process [158650]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2601:282:b00:b3b0:6886:e5ad:3978:3e0c:0 - "GET / HTTP/1.1" 200 OK
+INFO:     2601:282:b00:b3b0:6886:e5ad:3978:3e0c:0 - "GET /docs HTTP/1.1" 200 OK
+INFO:     2601:282:b00:b3b0:6886:e5ad:3978:3e0c:0 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/status HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/running HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/is-ready HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/status HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/status HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/running HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/is-ready HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [158650]
+INFO:     Started server process [161631]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2601:282:b00:b3b0:6886:e5ad:3978:3e0c:0 - "GET /docs HTTP/1.1" 200 OK
+INFO:     2601:282:b00:b3b0:6886:e5ad:3978:3e0c:0 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/status HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/running HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/is-ready HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/status HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/status HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/running HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/is-ready HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/status HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/status HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /ros/running HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/is-ready HTTP/1.1" 200 OK
+INFO:     10.0.0.91:0 - "GET /state-machine/status HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [161631]

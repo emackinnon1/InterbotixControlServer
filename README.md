@@ -35,3 +35,8 @@ Run prod server with uvicorn:
 ```bash
 uv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
+
+Check uvicorn logs:
+```bash
+tail -5 /tmp/uvicorn.log
+```
