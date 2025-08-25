@@ -26,8 +26,6 @@ jobs:
       
       - name: Setup ROS environment
         run: |
-          export RUNNER_ALLOW_RUNASROOT=1
-          export RUNNER_TRACKING_ID=0
           echo "Checking ROS workspace..."
           if [ ! -f workspace/install/setup.bash ]; then
             echo "ROS workspace not found, running setup script..."
@@ -41,4 +39,7 @@ jobs:
           fi
       
       - name: Deploy application
-        run: ./scripts/deploy.sh
+        run: |
+          export RUNNER_ALLOW_RUNASROOT=1
+          export RUNNER_TRACKING_ID=0
+          ./scripts/deploy.sh
