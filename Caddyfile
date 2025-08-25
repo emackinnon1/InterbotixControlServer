@@ -1,4 +1,4 @@
 rpi4-widowx250.local {
-  reverse_proxy localhost:8000
-  tls internal
+	reverse_proxy localhost:8000
+	tls internal
 }
