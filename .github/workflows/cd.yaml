@@ -20,7 +20,7 @@ jobs:
       - name: Verify deployment
         run: |
           echo "Waiting for services to start..."
-          sleep 5
+          sleep 6
           echo "Checking if services are running..."
           if pgrep -f "caddy" > /dev/null; then
             echo "✓ Caddy is running"
