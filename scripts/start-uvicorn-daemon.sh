@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Starting FastAPI as a daemon process..."
-cd /home/emackinnon1/InterbotixControlServer
+cd ~/InterbotixControlServer
 
 # Use setsid to create a new session completely detached from GitHub Actions
 setsid bash -c "
