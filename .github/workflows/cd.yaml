@@ -1,0 +1,21 @@
+on:
+  push:
+    branches: master
+  pull_requests:
+    branches: master
+
+
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, ARM64, rpi4-widowx250]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Deploy application
+        run: make deploy
