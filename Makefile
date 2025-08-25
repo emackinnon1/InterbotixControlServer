@@ -9,8 +9,7 @@ deploy:
 	@echo "Starting services..."
 	@caddy start
 	@echo "Starting FastAPI in detached shell..."
-	@nohup uv run uvicorn main:app --host 0.0.0.0 --port 8000 --pid-file /tmp/uvicorn.pid > /tmp/uvicorn.log 2>&1 &
-# 	@bash -c 'cd $(PWD) && exec setsid sh -c "exec nohup uv run uvicorn main:app --host 0.0.0.0 --port 8000 & > /tmp/uvicorn.log 2>&1 &" < /dev/null > /dev/null 2>&1 & echo $$! > /tmp/uvicorn_parent.pid'
+	@nohup uv run uvicorn main:app --host 0.0.0.0 --port 8000 &
 	@sleep 3
 	@echo "Services started successfully"
 
