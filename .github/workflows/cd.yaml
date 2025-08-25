@@ -14,8 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Setup Python environment
+        run: |
+          echo "Setting up Python virtual environment..."
+          uv venv
+          echo "Installing dependencies..."
+          uv sync
+      
       - name: Deploy application
-        run: RUNNER_TRACKING_ID=0 && RUNNER_ALLOW_RUNASROOT=1 && make deploy
+        run: make deploy
         
       - name: Verify deployment
         run: |
