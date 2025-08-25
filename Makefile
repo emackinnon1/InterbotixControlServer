@@ -3,14 +3,7 @@
 .PHONY: deploy
 
 deploy:
-	@echo "Deploying app: stopping existing services and restarting..."
-	@make cleanup
-	@echo "Starting services..."
-	@caddy start
-	@echo "Starting FastAPI in detached shell..."
-	@setsid nohup uv run uvicorn main:app --host 0.0.0.0 --port 8000 </dev/null >/tmp/uvicorn.log 2>&1 &
-	@sleep 3
-	@echo "Services started successfully"
+	@./scripts/deploy.sh
 
 start_prod:
 	@echo "Starting FastAPI and Caddy..."
