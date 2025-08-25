@@ -1,6 +1,23 @@
-*.pyc
-*.egg-info/
+# Ignore build artifacts that may contain host-specific CMakeCache files
+workspace/
+actions-runner/
 
-*.bag
-!waist_diagnostics.bag
-!duck_dunk.bag
+# Ignore Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore IDE files
+.vscode/
+*.swp
+*.swo
+
+# Ignore logs
+*.log
