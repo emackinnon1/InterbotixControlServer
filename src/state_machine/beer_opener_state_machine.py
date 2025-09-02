@@ -6,12 +6,13 @@ from .abstract_state_machine import (
     AbstractStateMachine, Movement, MovementSequence, MovementType
 )
 
-# Constants and BRAND_CONFIGS from your existing implementation
+DEFAULT_MOVING_TIME = 1.25
+
 WAIST_PICKUP_POSITION = -np.pi/1.89
 WAIST_BOTTLE_POSITION = -np.pi/5.65
 WRIST_ROTATE_GRASP = np.pi/2.11
 WRIST_ROTATE_INITIAL = np.pi/3.5
-WRIST_ROTATE_OPEN = np.pi/1.2
+WRIST_ROTATE_OPEN = np.pi/1.1
 LOWER_DISTANCE = -0.15
 REVERSE_DISTANCE = -0.193
 GRIPPER_LOWER_DISTANCE = -0.16
@@ -25,7 +26,7 @@ BRAND_CONFIGS = {
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "heineken": {
-        "waist_rotation": -np.pi/4.75,
+        "waist_rotation": -np.pi/4.7,
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "corona": {
@@ -44,7 +45,7 @@ class BeerOpenerState(Enum):
     ERROR = auto()
 
 class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
-    def __init__(self, bot, brand: str, default_wait_time: float = 2.0):
+    def __init__(self, bot, brand: str, default_wait_time: float = 1.5 * DEFAULT_MOVING_TIME):
         self.brand = brand
         super().__init__(bot, default_wait_time)
     
@@ -106,7 +107,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
     def _create_sequences(self) -> Dict[str, MovementSequence]:
         pickup_opener_sequence = MovementSequence("pickup_opener", [
             Movement(MovementType.GRIPPER_ACTION, {'action': 'release'}, "Release gripper"),
-            Movement(MovementType.GO_HOME, {'moving_time': 1.25}, "Go to home pose"),
+            Movement(MovementType.GO_HOME, {'moving_time': DEFAULT_MOVING_TIME}, "Go to home pose"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_PICKUP_POSITION}, "Rotate to pickup position"),
             Movement(MovementType.CARTESIAN_MOVE, {'z': LOWER_DISTANCE, 'x': REVERSE_DISTANCE}, "Lower and move to opener"),
             Movement(MovementType.WAIT, {'duration': 2.0}, "Wait for stabilization"),
@@ -134,7 +135,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         ])
         
         return_opener_sequence = MovementSequence("return_opener", [
-            Movement(MovementType.GO_HOME, {'moving_time': 1.25}, "Go to home pose"),
+            Movement(MovementType.GO_HOME, {'moving_time': DEFAULT_MOVING_TIME}, "Go to home pose"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_PICKUP_POSITION}, "Rotate to return position"),
             Movement(MovementType.CARTESIAN_MOVE, {'z': LOWER_DISTANCE, 'x': REVERSE_DISTANCE}, "Lower to return opener"),
             Movement(MovementType.WAIT, {'duration': 2.0}, "Wait for positioning"),
@@ -177,7 +178,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for positioning"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.25}, "Rotate wrist to open", skip_default_wait=True),
             Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE}, "Raise while opening", skip_default_wait=True),
-            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': 1.25}, "Complete opening motion", skip_default_wait=True),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': DEFAULT_MOVING_TIME}, "Complete opening motion", skip_default_wait=True),
             Movement(MovementType.WAIT, {'duration': 0.5}, "Wait for opening completion")
         ])
     
@@ -236,8 +237,8 @@ def open_beer_state_machine(brand: str, wait_time: float = 2.0):
         robot_model='wx250',
         group_name='arm',
         gripper_name='gripper',
-        moving_time=1.25,
-        gripper_pressure=0.85           
+        moving_time=DEFAULT_MOVING_TIME,
+        gripper_pressure=0.9           
     )
 
     # Create and run state machine with robot management
