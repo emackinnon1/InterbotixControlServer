@@ -46,6 +46,8 @@ class ROSLaunchManager:
             f"robot_model:={robot_model}"
         ]
         self.ros_root = "/opt/ros/humble"
+        self.recent_log_lines: list[str] = []  # Store recent log lines for error checking
+        self.max_recent_log_lines: int = 100  # Limit for stored log lines
     
     def _is_critical_error(self, stderr_line: str) -> bool:
         """
@@ -60,6 +62,14 @@ class ROSLaunchManager:
         stderr_upper = stderr_line.upper()
         return any(pattern in stderr_upper for pattern in self.critical_error_patterns)
     
+    def _add_log_line(self, line: str):
+        """
+        Add a log line to the recent log buffer, maintaining the max limit.
+        """
+        self.recent_log_lines.append(line)
+        if len(self.recent_log_lines) > self.max_recent_log_lines:
+            self.recent_log_lines = self.recent_log_lines[-self.max_recent_log_lines:]
+
     async def _stream_process_output(self, process: asyncio.subprocess.Process, process_name: str):
         """
         Stream stdout and stderr from a process to logs in real-time.
@@ -74,6 +84,7 @@ class ROSLaunchManager:
                     decoded_line = line.decode().strip()
                     if decoded_line:
                         self.logger.info(f"ROS {process_name} stdout: {decoded_line}")
+                        self._add_log_line(decoded_line)
         
         async def stream_stderr():
             if process.stderr:
@@ -81,6 +92,7 @@ class ROSLaunchManager:
                     decoded_line = line.decode().strip()
                     if decoded_line:
                         self.logger.warning(f"ROS {process_name} stderr: {decoded_line}")
+                        self._add_log_line(decoded_line)
                         
                         # Check for critical errors and update status immediately
                         if self._is_critical_error(decoded_line):
@@ -224,6 +236,11 @@ class ROSLaunchManager:
                     self._monitor_process_health()
                 )
                 
+                # Monitor logs for errors after starting
+                error_line = await self.monitor_logs_for_errors(timeout=5)
+                if error_line:
+                    self.logger.error(f"ROS launch error detected after start: {error_line}")
+                    return False
                 return True
             else:
                 # Process failed to start
@@ -390,6 +407,63 @@ class ROSLaunchManager:
         except:
             return None, None
     
+    async def monitor_logs_for_errors(self, timeout: int = 5) -> Optional[str]:
+        """
+        Monitor recent logs for specific error messages after start/restart.
+        
+        Args:
+            timeout: seconds to wait and check logs
+        
+        Returns:
+            str: Error message if found, else None
+        """
+        error_patterns = [
+            "stack smashing detected",
+            "process has died",
+            "exit code -6"
+        ]
+        ignore_patterns = [
+            "rviz2"
+        ]
+        import time
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            for line in self.recent_log_lines:
+                # Ignore rviz2 errors
+                if any(ignore in line for ignore in ignore_patterns):
+                    continue
+                for pattern in error_patterns:
+                    if pattern in line:
+                        self.logger.error(f"Detected ROS launch error: {line}")
+                        self.status = ROSStatus.ERROR
+                        self.error_message = f"Detected error in logs: {line}"
+                        return line
+            await asyncio.sleep(0.5)
+        return None
+
+    def check_recent_logs_for_errors(self) -> Optional[str]:
+        """
+        Check recent logs for error patterns (non-async, for status endpoint or polling).
+        
+        Returns:
+            str: Error message if found, else None
+        """
+        error_patterns = [
+            "stack smashing detected",
+            "process has died",
+            "exit code -6"
+        ]
+        ignore_patterns = [
+            "rviz2"
+        ]
+        for line in self.recent_log_lines:
+            if any(ignore in line for ignore in ignore_patterns):
+                continue
+            for pattern in error_patterns:
+                if pattern in line:
+                    return line
+        return None
+    
     async def restart(self) -> bool:
         """
         Restart the ROS launch process.
@@ -399,7 +473,14 @@ class ROSLaunchManager:
         """
         await self.stop_ros_launch()
         await asyncio.sleep(2)  # Give it time to fully stop
-        return await self.start_ros_launch()
+        result = await self.start_ros_launch()
+        # Monitor logs for errors after restart
+        if result:
+            error_line = await self.monitor_logs_for_errors(timeout=5)
+            if error_line:
+                self.logger.error(f"ROS launch error detected after restart: {error_line}")
+                return False
+        return result
 
 def get_ros_manager():
     """
