@@ -1,0 +1,30 @@
+# Ignore VCS and local files
+.git
+.gitignore
+**/__pycache__/
+**/*.py[cod]
+**/*.so
+
+# Python environments
+.venv/
+venv/
+.env
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# ROS/colcon workspace outputs (mounted or built in container instead)
+workspace/build/
+workspace/install/
+workspace/log/
+
+# Actions runner cache/archives
+actions-runner/
+
+# Keep lockfile for reproducible installs

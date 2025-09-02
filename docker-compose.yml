@@ -1,0 +1,28 @@
+services:
+  interbotix-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: interbotix-control:arm64
+    platform: linux/arm64
+    network_mode: host
+    privileged: true
+    tty: true
+    restart: unless-stopped
+    mem_limit: 8g
+    ulimits:
+      stack: 65536   # KB (64 MiB)
+      core: -1
+    environment:
+      # Optionally set ROS_IP on the host when needed, otherwise container will try to detect
+      - ROS_IP=${ROS_IP:-}
+      - TZ=UTC
+    volumes:
+      # Provide direct USB bus access when running privileged
+      - /dev/bus/usb:/dev/bus/usb
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyDXL"
+    group_add:
+      - dialout
+    # You can override the command if you want to run interactive diagnostics
+    # command: ["/bin/bash"]

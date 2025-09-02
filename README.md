@@ -40,3 +40,37 @@ Check uvicorn logs:
 ```bash
 tail -5 /tmp/uvicorn.log
 ```
+
+## USB and udev in Docker
+
+This image installs Interbotix udev rules during build; however, udev is not typically active inside containers. For reliable device access, configure udev rules on the host and pass devices into the container.
+
+Preferred (narrow) access:
+
+```bash
+docker run --rm -it \
+	--platform linux/arm64 \
+	--device=/dev/ttyUSB0 \
+	--group-add dialout \
+	-p 8000:8000 \
+	interbotix-control:arm64
+```
+
+If your device enumerates as ACM:
+
+```bash
+--device=/dev/ttyACM0
+```
+
+Alternate (broad) access if needed:
+
+```bash
+docker run --rm -it \
+	--platform linux/arm64 \
+	--privileged \
+	-v /dev/bus/usb:/dev/bus/usb \
+	-p 8000:8000 \
+	interbotix-control:arm64
+```
+
+Note: The container runs as non-root user `app` added to `dialout` and `plugdev`. If you mount additional device nodes, ensure groups are appropriate or add `--group-add` at runtime.
