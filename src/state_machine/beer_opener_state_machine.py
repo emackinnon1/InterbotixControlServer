@@ -7,6 +7,7 @@ from .abstract_state_machine import (
 )
 
 DEFAULT_MOVING_TIME = 1.25
+DEFAULT_WAIT_TIME = 1.75 * DEFAULT_MOVING_TIME
 
 WAIST_PICKUP_POSITION = -np.pi/1.89
 WAIST_BOTTLE_POSITION = -np.pi/5.65
@@ -45,7 +46,7 @@ class BeerOpenerState(Enum):
     ERROR = auto()
 
 class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
-    def __init__(self, bot, brand: str, default_wait_time: float = 1.5 * DEFAULT_MOVING_TIME):
+    def __init__(self, bot, brand: str, default_wait_time: float = DEFAULT_WAIT_TIME):
         self.brand = brand
         super().__init__(bot, default_wait_time)
     
@@ -126,7 +127,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         
         approach_bottle_sequence = MovementSequence("approach_bottle", [
             Movement(MovementType.GO_HOME, {}, "Go to home pose"),
-            Movement(MovementType.POSE_COMPONENTS, {'x': 0.21, 'z': 0.35}, "Move to bottle approach position"),
+            Movement(MovementType.POSE_COMPONENTS, {'x': 0.22, 'z': 0.35}, "Move to bottle approach position"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait at approach position"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_INITIAL}, "Rotate wrist for bottle"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),

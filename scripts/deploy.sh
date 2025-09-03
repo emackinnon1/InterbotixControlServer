@@ -92,7 +92,9 @@ verify_services() {
         return 1
     fi
     
-    # Check HTTP response
+    # Check HTTP response (wait briefly before probing)
+    log "Waiting ${HTTP_CHECK_DELAY:-3}s before HTTP health check..."
+    sleep "${HTTP_CHECK_DELAY:-3}"
     if curl -s -f http://localhost:8000/ > /dev/null; then
         log "✓ FastAPI is responding to HTTP requests"
     else
