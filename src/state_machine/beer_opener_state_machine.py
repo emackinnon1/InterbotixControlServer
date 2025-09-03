@@ -127,7 +127,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         
         approach_bottle_sequence = MovementSequence("approach_bottle", [
             Movement(MovementType.GO_HOME, {}, "Go to home pose"),
-            Movement(MovementType.POSE_COMPONENTS, {'x': 0.21, 'z': 0.35}, "Move to bottle approach position"),
+            Movement(MovementType.POSE_COMPONENTS, {'x': 0.22, 'z': 0.34}, "Move to bottle approach position"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait at approach position"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_INITIAL}, "Rotate wrist for bottle"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),
@@ -178,8 +178,8 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': waist_rotation}, "Position opener on bottle cap"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for positioning"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.25}, "Rotate wrist to open", skip_default_wait=True),
-            Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE}, "Raise while opening"),
-            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': DEFAULT_MOVING_TIME}, "Complete opening motion"),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE}, "Raise while opening", skip_default_wait=True),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': DEFAULT_MOVING_TIME}, "Complete opening motion", skip_default_wait=True),
             Movement(MovementType.WAIT, {'duration': 0.5}, "Wait for opening completion")
         ])
     
