@@ -8,6 +8,7 @@ from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_startup
 
 from .abstract_state_machine import AbstractStateMachine
+from .beer_opener_state_machine import DEFAULT_MOVING_TIME
 
 @dataclass
 class StateMachineStatus:
@@ -56,8 +57,8 @@ class StateMachineManager:
                 robot_model=robot_model,
                 group_name='arm',
                 gripper_name='gripper',
-                moving_time=1.25,
-                gripper_pressure=0.85
+                moving_time=DEFAULT_MOVING_TIME,
+                gripper_pressure=0.9
             )
             robot_startup()
             

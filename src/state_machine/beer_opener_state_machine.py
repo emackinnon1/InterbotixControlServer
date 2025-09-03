@@ -126,7 +126,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         
         approach_bottle_sequence = MovementSequence("approach_bottle", [
             Movement(MovementType.GO_HOME, {}, "Go to home pose"),
-            Movement(MovementType.POSE_COMPONENTS, {'x': 0.215, 'z': 0.35}, "Move to bottle approach position"),
+            Movement(MovementType.POSE_COMPONENTS, {'x': 0.22, 'z': 0.34}, "Move to bottle approach position"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait at approach position"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_INITIAL}, "Rotate wrist for bottle"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),
@@ -229,21 +229,3 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             self._safe_shutdown_sequence()
             return False
 
-def open_beer_state_machine(brand: str, wait_time: float = 2.0):
-    """Main function to open a beer bottle using the abstract state machine"""
-    from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
-    
-    bot = InterbotixManipulatorXS(
-        robot_model='wx250',
-        group_name='arm',
-        gripper_name='gripper',
-        moving_time=DEFAULT_MOVING_TIME,
-        gripper_pressure=0.9           
-    )
-
-    # Create and run state machine with robot management
-    state_machine = BeerOpenerStateMachine(bot, brand, wait_time)
-    return state_machine.run_with_robot_management()
-
-if __name__ == '__main__':
-    open_beer_state_machine("heineken")
