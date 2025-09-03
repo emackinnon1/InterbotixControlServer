@@ -126,7 +126,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         
         approach_bottle_sequence = MovementSequence("approach_bottle", [
             Movement(MovementType.GO_HOME, {}, "Go to home pose"),
-            Movement(MovementType.POSE_COMPONENTS, {'x': 0.21, 'z': 0.35}, "Move to bottle approach position"),
+            Movement(MovementType.POSE_COMPONENTS, {'x': 0.20, 'z': 0.35}, "Move to bottle approach position"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait at approach position"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_INITIAL}, "Rotate wrist for bottle"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),
