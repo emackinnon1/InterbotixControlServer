@@ -7,6 +7,7 @@ from .abstract_state_machine import (
 )
 
 DEFAULT_MOVING_TIME = 1.25
+DEFAULT_WAIT_TIME = 2*DEFAULT_MOVING_TIME
 
 WAIST_PICKUP_POSITION = -np.pi/1.89
 WAIST_BOTTLE_POSITION = -np.pi/5.65
@@ -45,7 +46,7 @@ class BeerOpenerState(Enum):
     ERROR = auto()
 
 class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
-    def __init__(self, bot, brand: str, default_wait_time: float = 1.5 * DEFAULT_MOVING_TIME):
+    def __init__(self, bot, brand: str, default_wait_time: float = DEFAULT_WAIT_TIME):
         self.brand = brand
         super().__init__(bot, default_wait_time)
     
