@@ -9,12 +9,12 @@ services:
     devices:
       - "/dev/ttyUSB0:/dev/ttyUSB0"
       - "/dev/ttyACM0:/dev/ttyACM0"
-    # volumes:
-      # - "/opt/ros/humble:/opt/ros/humble"
-      # - "./src:InterbotixControlServer/src"
-      # - "./install:/opt/ros/workspace/install"
-      # - "ros_build:/opt/ros/workspace/build"
-      # - "ros_log:/opt/ros/workspace/log"
+    volumes:
+      - "/dev:/dev"
+      - "./src:/opt/ros/workspace/src"
+      - "./install:/opt/ros/workspace/install"
+      - "ros_build:/opt/ros/workspace/build"
+      - "ros_log:/opt/ros/workspace/log"
     environment:
       - ROS_DOMAIN_ID=0
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
