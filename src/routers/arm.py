@@ -210,9 +210,9 @@ async def _on_startup():
   await _start_worker()
 
 @arm_router.on_event("shutdown")
-def _on_shutdown():
+async def _on_shutdown():
   if _robot:
-    safe_shutdown_sync(_robot)
+    await asyncio.to_thread(safe_shutdown_sync, _robot)
 
 @arm_router.get("/position")
 async def arm_position():
