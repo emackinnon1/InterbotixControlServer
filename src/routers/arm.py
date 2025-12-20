@@ -51,7 +51,7 @@ class ArmMoveRequest(BaseModel):
   def validate_exclusive(self):
     if (self.command and self.commands) or (not self.command and not self.commands):
       raise ValueError("Provide either 'command' or 'commands'.")
-    if self.moving_time is not None and self.moving_time <= 0:
+    if self.moving_time <= 0:
       raise ValueError("moving_time must be > 0")
     return self
 
