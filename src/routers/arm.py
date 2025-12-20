@@ -6,10 +6,13 @@ from typing import Dict, Any, Optional, List
 import asyncio
 import time
 import uuid
+import logging
 
-from src.state_machine.abstract_state_machine import Movement, MovementType
+from src.state_machine.abstract_state_machine import Movement, MovementType, MovementExecutor
 from src.state_machine.safe_shutdown import safe_shutdown_sync
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+
+LOGGER = logging.getLogger(__name__)
 
 class TorqueStateEnum(Enum):
   enable = "true"
@@ -95,8 +98,8 @@ def _init_robot():
     # Ensure torque is enabled for operation
     try:
       _robot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
-    except Exception:
-      pass
+    except Exception as e:
+      LOGGER.info(f"Exception enabling torque: {e}")
 
 async def _start_worker():
   global _worker_task
@@ -154,7 +157,6 @@ def _map_to_movements(cmds: List[MovementCommandInput], default_moving_time: flo
   return movements
 
 async def _jobs_worker():
-  from src.state_machine.abstract_state_machine import MovementExecutor
   if _robot is None:
     return
   executor = MovementExecutor(_robot, default_wait_time=1.0)
@@ -198,6 +200,8 @@ async def _jobs_worker():
       job.finished_at = time.time()
       job.elapsed_ms = int((job.finished_at - job.submitted_at) * 1000)
       _job_queue.task_done()
+      if job.state in (JobState.succeeded, JobState.failed):
+        _jobs.pop(job_id, None)
 
 @arm_router.on_event("startup")
 async def _on_startup():

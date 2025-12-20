@@ -1,8 +1,10 @@
 from enum import Enum, auto
 from typing import List
+import logging
 
 from .abstract_state_machine import AbstractStateMachine, Movement, MovementSequence
 
+LOGGER = logging.getLogger(__name__)
 
 class SimpleState(Enum):
     INIT = auto()
@@ -44,6 +46,7 @@ class SimpleMovementStateMachine(AbstractStateMachine[SimpleState]):
             elif self.state == SimpleState.ERROR:
                 return False
             return True
-        except Exception:
+        except Exception as e:
             self.state = SimpleState.ERROR
+            LOGGER.info(f"Exception SimpleMovementStateMachine: {e}")
             return False
