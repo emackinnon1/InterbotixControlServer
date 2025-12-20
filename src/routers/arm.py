@@ -100,6 +100,7 @@ def _init_robot():
       _robot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
     except Exception as e:
       LOGGER.info(f"Exception enabling torque: {e}")
+      raise e
 
 async def _start_worker():
   global _worker_task
