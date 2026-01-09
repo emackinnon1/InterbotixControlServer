@@ -10,6 +10,7 @@ import logging
 
 from src.state_machine.abstract_state_machine import Movement, MovementType, MovementExecutor
 from src.state_machine.safe_shutdown import safe_shutdown_sync
+from src.dependencies.robot_manager import get_robot_manager
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 
 LOGGER = logging.getLogger(__name__)
@@ -85,22 +86,11 @@ _jobs: Dict[str, ArmMoveJobStatus] = {}
 _worker_task: Optional[asyncio.Task] = None
 _worker_lock = asyncio.Lock()
 
-def _init_robot():
+async def _init_robot():
   global _robot
   if _robot is None:
-    _robot = InterbotixManipulatorXS(
-      robot_model='wx250',
-      group_name='arm',
-      gripper_name='gripper',
-      moving_time=2.0,
-      gripper_pressure=0.9
-    )
-    # Ensure torque is enabled for operation
-    try:
-      _robot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
-    except Exception as e:
-      LOGGER.info(f"Exception enabling torque: {e}")
-      raise e
+    manager = get_robot_manager()
+    _robot = await manager.get_robot()
 
 async def _start_worker():
   global _worker_task
@@ -206,7 +196,7 @@ async def _jobs_worker():
 
 @arm_router.on_event("startup")
 async def _on_startup():
-  _init_robot()
+  await _init_robot()
   await _start_worker()
 
 @arm_router.on_event("shutdown")
