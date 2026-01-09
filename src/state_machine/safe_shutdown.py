@@ -1,6 +1,6 @@
 import time
 
-def safe_shutdown_sync(bot) -> bool:
+def safe_shutdown_sync(bot: 'InterbotixManipulatorXS') -> bool:
     """Safely release gripper, go home, go sleep, disable torque.
     Returns True if torque disable step succeeds; False otherwise.
     Any intermediate errors are logged but do not abort sequence.

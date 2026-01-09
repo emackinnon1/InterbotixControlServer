@@ -18,7 +18,7 @@ class SimpleMovementStateMachine(AbstractStateMachine[SimpleState]):
     to reuse AbstractStateMachine execution if needed.
     """
 
-    def __init__(self, bot, movements: List[Movement], default_wait_time: float = 1.0):
+    def __init__(self, bot: 'InterbotixManipulatorXS', movements: List[Movement], default_wait_time: float = 1.0):
         self._provided_movements = movements
         super().__init__(bot, default_wait_time)
 
