@@ -265,14 +265,14 @@ async def get_job(job_id: str):
 async def list_jobs():
   return list(_jobs.values())[-50:]
 
-@arm_route.post("/go-home")
+@arm_router.post("/go-home")
 async def go_home():
   try:
     _robot.core.go_to_home_pose()
   except Exception as exc:
     raise HTTPException(500, f"Failed to go to home pose: {exc}") from exc
 
-@arm_route.post("/go-sleep")
+@arm_router.post("/go-sleep")
 async def go_sleep():
   try:
     _robot.core.go_to_sleep_pose()
