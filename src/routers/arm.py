@@ -211,7 +211,7 @@ async def arm_position():
 @arm_router.post("/torque/{desired_state}")
 async def torque(desired_state: TorqueStateEnum):
   """
-  Enable or disable torque for the robot arm without shelling out to ros2.
+  Enable or disable torque for the robot arm.
   """
   if _robot is None:
     raise HTTPException(503, "Robot not initialized")
