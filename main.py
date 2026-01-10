@@ -2,12 +2,14 @@ import logging
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
+from src.dependencies.ros_manager import get_ros_manager
+from src.dependencies.robot_manager import get_robot_manager
 from src.routers.task import tasks_router
 from src.routers.arm import arm_router
 from src.routers.ros import ros_router
 from src.routers.state_machine import state_machine_router
-
-from src.dependencies.ros_manager import get_ros_manager
+from src.state_machine.safe_shutdown import safe_shutdown_sync
+from src.state_machine.state_machine_manager import StateMachineManager
 
 
 
@@ -22,6 +24,11 @@ async def lifespan(app: FastAPI):
     ros_manager = get_ros_manager()
     await ros_manager.start_ros_launch()
     yield
+    bot_manager = get_robot_manager()
+    bot = await manager.get_robot()
+    await asyncio.to_thread(safe_shutdown_sync, bot)
+    state_machine_manager = StateMachineManager()
+    state_machine_manager.cleanup()
     await ros_manager.stop_ros_launch()
 
 
@@ -35,10 +42,3 @@ app.include_router(state_machine_router)
 @app.get("/")
 def read_root():
     return {"message": "Interbotix Control Server is running"}
-
-# Cleanup on shutdown
-@app.on_event("shutdown")
-def shutdown_event():
-    from src.state_machine.state_machine_manager import StateMachineManager
-    manager = StateMachineManager()
-    manager.cleanup()
