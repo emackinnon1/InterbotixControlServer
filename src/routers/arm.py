@@ -203,9 +203,9 @@ async def initialize_arm():
     raise HTTPException(500, f"Failed to initialize robot: {exc}") from exc
   return {"status": "initialized"}
 
-@arm_router.get("/position")
+@arm_router.get("/current-position")
 async def arm_position():
-  return {"joint_1": 2}
+  return {"current_positions": _robot.core.get_joint_positions()}
 
 
 @arm_router.post("/torque/{desired_state}")
@@ -264,3 +264,17 @@ async def get_job(job_id: str):
 @arm_router.get("/jobs")
 async def list_jobs():
   return list(_jobs.values())[-50:]
+
+@arm_route.post("/go-home")
+async def go_home():
+  try:
+    _robot.core.go_to_home_pose()
+  except Exception as exc:
+    raise HTTPException(500, f"Failed to go to home pose: {exc}") from exc
+
+@arm_route.post("/go-sleep")
+async def go_sleep():
+  try:
+    _robot.core.go_to_sleep_pose()
+  except Exception as exc:
+    raise HTTPException(500, f"Failed to go to sleep pose: {exc}") from exc
