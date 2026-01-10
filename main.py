@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
     await ros_manager.start_ros_launch()
     yield
     bot_manager = get_robot_manager()
-    bot = await manager.get_robot()
+    bot = await bot_manager.get_robot()
     await asyncio.to_thread(safe_shutdown_sync, bot)
     state_machine_manager = StateMachineManager()
     state_machine_manager.cleanup()
