@@ -207,7 +207,7 @@ async def initialize_arm():
 async def arm_position():
   return {"joint_1": 2}
 
-# TODO: change this route to state machine and use state machine to control torque
+
 @arm_router.post("/torque/{desired_state}")
 async def torque(desired_state: TorqueStateEnum):
   """
