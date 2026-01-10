@@ -2,9 +2,11 @@ import time
 from enum import Enum, auto
 from typing import Dict
 import numpy as np
+
 from .abstract_state_machine import (
     AbstractStateMachine, Movement, MovementSequence, MovementType
 )
+from src.dependencies.robot_manager import get_robot_manager
 
 DEFAULT_MOVING_TIME = 1.25
 DEFAULT_WAIT_TIME = 1.75 * DEFAULT_MOVING_TIME
@@ -234,13 +236,15 @@ def open_beer_state_machine(brand: str, wait_time: float = 2.0):
     """Main function to open a beer bottle using the abstract state machine"""
     from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
     
-    bot = InterbotixManipulatorXS(
-        robot_model='wx250',
-        group_name='arm',
-        gripper_name='gripper',
-        moving_time=DEFAULT_MOVING_TIME,
-        gripper_pressure=0.9           
-    )
+    # bot = InterbotixManipulatorXS(
+    #     robot_model='wx250',
+    #     group_name='arm',
+    #     gripper_name='gripper',
+    #     moving_time=DEFAULT_MOVING_TIME,
+    #     gripper_pressure=0.9           
+    # )
+    manager = get_robot_manager()
+    bot = await manager.get_robot()
 
     # Create and run state machine with robot management
     state_machine = BeerOpenerStateMachine(bot, brand, wait_time)
