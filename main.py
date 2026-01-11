@@ -10,7 +10,7 @@ from src.routers.arm import arm_router
 from src.routers.ros import ros_router
 from src.routers.state_machine import state_machine_router
 from src.state_machine.safe_shutdown import safe_shutdown_sync
-from src.dependencies.state_machine_manager import get_state_machine_manager
+from src.dependencies.state_machine_deps import get_state_machine_manager
 
 
 
