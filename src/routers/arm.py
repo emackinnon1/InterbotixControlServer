@@ -268,13 +268,13 @@ async def list_jobs():
 @arm_router.post("/go-home")
 async def go_home():
   try:
-    _robot.arm.go_to_home_pose()
+     await asyncio.to_thread(_robot.arm.go_to_home_pose())
   except Exception as exc:
     raise HTTPException(500, f"Failed to go to home pose: {exc}") from exc
 
 @arm_router.post("/go-sleep")
 async def go_sleep():
   try:
-    _robot.core.go_to_sleep_pose()
+     await asyncio.to_thread(_robot.arm.go_to_sleep_pose())
   except Exception as exc:
     raise HTTPException(500, f"Failed to go to sleep pose: {exc}") from exc
