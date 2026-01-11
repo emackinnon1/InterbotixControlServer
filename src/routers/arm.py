@@ -268,7 +268,7 @@ async def list_jobs():
 @arm_router.post("/go-home")
 async def go_home():
   try:
-    _robot.core.go_to_home_pose()
+    _robot.arm.go_to_home_pose()
   except Exception as exc:
     raise HTTPException(500, f"Failed to go to home pose: {exc}") from exc
 

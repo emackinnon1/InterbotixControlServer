@@ -2,6 +2,9 @@
 
 set -e  # Exit on any error
 
+# Allow override but ensure a default HTTP health-check delay
+HTTP_CHECK_DELAY="${HTTP_CHECK_DELAY:-8}"
+
 echo "=== InterbotixControlServer Deployment Script ==="
 
 # Function to log with timestamp
@@ -93,8 +96,8 @@ verify_services() {
     fi
     
     # Check HTTP response (wait briefly before probing)
-    log "Waiting ${HTTP_CHECK_DELAY:-3}s before HTTP health check..."
-    sleep "${HTTP_CHECK_DELAY:-3}"
+    log "Waiting ${HTTP_CHECK_DELAY}s before HTTP health check..."
+    sleep "${HTTP_CHECK_DELAY}"
     if curl -s -f http://localhost:8000/ > /dev/null; then
         log "✓ FastAPI is responding to HTTP requests"
     else
