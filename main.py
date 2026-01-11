@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
     await ros_manager.stop_ros_launch()
 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(tasks_router)
 app.include_router(arm_router)
