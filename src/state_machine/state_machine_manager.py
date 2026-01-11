@@ -7,6 +7,7 @@ from datetime import datetime
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_startup
 
+from src.dependencies.robot_manager import get_robot_manager
 from .abstract_state_machine import AbstractStateMachine
 from .beer_opener_state_machine import DEFAULT_MOVING_TIME
 
@@ -42,25 +43,26 @@ class StateMachineManager:
         if not self._initialized:
             self._initialized = True
             self._current_state_machine: Optional[AbstractStateMachine] = None
-            self._robot_bot: Optional[InterbotixManipulatorXS] = None
+            self._robot: Optional[InterbotixManipulatorXS] = None
             self._status = StateMachineStatus()
             self._execution_thread: Optional[threading.Thread] = None
             self._stop_requested = False
     
-    def initialize_robot(self, robot_model: str = 'wx250') -> bool:
+    async def initialize_robot(self, robot_model: str = 'wx250') -> bool:
         """Initialize the robot connection"""
         try:
-            if self._robot_bot is not None:
+            if self._robot is not None:
                 return True
                 
-            self._robot_bot = InterbotixManipulatorXS(
-                robot_model=robot_model,
-                group_name='arm',
-                gripper_name='gripper',
-                moving_time=DEFAULT_MOVING_TIME,
-                gripper_pressure=0.85
-            )
-            robot_startup()
+            # self._robot = InterbotixManipulatorXS(
+            #     robot_model=robot_model,
+            #     group_name='arm',
+            #     gripper_name='gripper',
+            #     moving_time=DEFAULT_MOVING_TIME,
+            #     gripper_pressure=0.85
+            # )
+            self._manager = get_robot_manager()
+            self._robot = await self._manager.get_robot()
             
             return True
             
@@ -71,12 +73,12 @@ class StateMachineManager:
     def shutdown_robot(self):
         """Shutdown the robot connection"""
         try:
-            if self._robot_bot is not None:
-                self._robot_bot.arm.go_to_home_pose()
-                self._robot_bot.arm.go_to_sleep_pose()
-                self._robot_bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
+            if self._robot is not None:
+                self._robot.arm.go_to_home_pose()
+                self._robot.arm.go_to_sleep_pose()
+                self._robot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
                 robot_shutdown()
-                self._robot_bot = None
+                self._robot = None
         except Exception as e:
             self._status.last_error = f"Error shutting down robot: {str(e)}"
     
@@ -89,7 +91,7 @@ class StateMachineManager:
             if self._status.is_running:
                 raise RuntimeError("Cannot create new state machine while another is running")
             
-            self._current_state_machine = state_machine_class(self._robot_bot, **kwargs)
+            self._current_state_machine = state_machine_class(self._robot, **kwargs)
             self._update_status()
             return True
             
@@ -193,7 +195,7 @@ class StateMachineManager:
     def is_ready(self) -> bool:
         """Check if the manager is ready for new operations"""
         return (
-            self._robot_bot is not None and 
+            self._robot is not None and 
             not self._status.is_running and 
             not self._stop_requested
         )

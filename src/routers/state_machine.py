@@ -85,7 +85,7 @@ async def initialize_robot(
 ) -> Dict[str, str]:
     """Initialize the robot connection"""
     
-    success = manager.initialize_robot(robot_model)
+    success = await manager.initialize_robot(robot_model)
     
     if not success:
         raise HTTPException(status_code=500, detail="Failed to initialize robot")

@@ -4,6 +4,7 @@ import time
 from typing import Optional
 
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_startup
 
 from .ros_manager import get_ros_manager
 
@@ -31,6 +32,7 @@ class RobotConnectionManager:
                     gripper_pressure=0.9,
                 )
                 try:
+                    robot_startup()
                     self._robot.core.robot_torque_enable(cmd_type="group", name="all", enable=True)
                 except Exception as exc:
                     LOGGER.info("Exception enabling torque: %s", exc)
@@ -93,6 +95,48 @@ class RobotConnectionManager:
 
         services = [line.strip() for line in stdout.decode().splitlines() if line.strip()]
         return services
+
+    async def safe_shutdown(self) -> bool:
+        async with self._lock:
+            if self._robot is None:
+                return True
+            bot = self._robot
+            self._robot = None
+        return self._safe_shutdown_sync()
+
+    def _safe_shutdown_sync(self) -> bool:
+        """Safely release gripper, go home, go sleep, disable torque.
+        Returns True if torque disable step succeeds; False otherwise.
+        Any intermediate errors are logged but do not abort sequence.
+        """
+        try:
+            _robot.gripper.release()
+            print("[safe_shutdown] Gripper released")
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"[safe_shutdown] Warning release gripper: {e}")
+        try:
+            _robot.arm.go_to_home_pose(moving_time=2.0)
+            print("[safe_shutdown] Home pose reached")
+            time.sleep(1.0)
+        except Exception as e:
+            print(f"[safe_shutdown] Warning home pose: {e}")
+        try:
+            _robot.arm.go_to_sleep_pose(moving_time=2.0)
+            print("[safe_shutdown] Sleep pose reached")
+            time.sleep(1.0)
+        except Exception as e:
+            print(f"[safe_shutdown] Warning sleep pose: {e}")
+        try:
+            _robot.core.robot_reboot_motors(cmd_type='group', name='all', enable=False, smart_reboot=True)
+            _robot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
+            print("[safe_shutdown] Torque disabled")
+            robot_shutdown()
+            return True
+        except Exception as e:
+            print(f"[safe_shutdown] Warning torque disable: {e}")
+            return False
+
 
 
 def get_robot_manager() -> RobotConnectionManager:
