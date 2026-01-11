@@ -24,12 +24,19 @@ logging.basicConfig(
 async def lifespan(app: FastAPI):
     ros_manager = get_ros_manager()
     await ros_manager.start_ros_launch()
+    
     yield
+    
+    # stop state machine
+    state_machine_manager = get_state_machine_manager()
+    state_machine_manager.stop_execution()
+    
+    # shutdown bot
     bot_manager = get_robot_manager()
     bot = await bot_manager.get_robot()
     await asyncio.to_thread(safe_shutdown_sync, bot)
-    state_machine_manager = get_state_machine_manager()
-    state_machine_manager.cleanup()
+    
+    # stop ROS
     await ros_manager.stop_ros_launch()
 
 
