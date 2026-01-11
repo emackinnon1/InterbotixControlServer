@@ -8,12 +8,16 @@ import time
 import uuid
 import logging
 
+from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+
 from src.state_machine.abstract_state_machine import Movement, MovementType, MovementExecutor
 from src.state_machine.safe_shutdown import safe_shutdown_sync
 from src.dependencies.robot_manager import get_robot_manager
-from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+
 
 LOGGER = logging.getLogger(__name__)
+
+_bot_manager = get_robot_manager()
 
 class TorqueStateEnum(Enum):
   enable = "true"
@@ -25,9 +29,6 @@ arm_router = APIRouter(
   tags=["arm"]
 )
 
-############################
-# Movement job infrastructure
-############################
 
 class MovementCommandType(str, Enum):
   set_single_joint_position = "set_single_joint_position"
@@ -79,18 +80,17 @@ class ArmMoveJobStatus(BaseModel):
   stopped_at_index: Optional[int] = None
   elapsed_ms: Optional[int] = None
 
+async def _init_robot():
+  global _robot
+  if _robot is None:
+    _robot = await _bot_manager.get_robot()
+
 # Globals
 _robot: Optional[InterbotixManipulatorXS] = None
 _job_queue: "asyncio.Queue[dict]" = asyncio.Queue()
 _jobs: Dict[str, ArmMoveJobStatus] = {}
 _worker_task: Optional[asyncio.Task] = None
 _worker_lock = asyncio.Lock()
-
-async def _init_robot():
-  global _robot
-  if _robot is None:
-    manager = get_robot_manager()
-    _robot = await manager.get_robot()
 
 async def _start_worker():
   global _worker_task
@@ -176,7 +176,8 @@ async def _jobs_worker():
           job.state = JobState.failed
           job.stopped_at_index = i
           failure = True
-          await asyncio.to_thread(safe_shutdown_sync, _robot)
+          # await asyncio.to_thread(safe_shutdown_sync, _robot)
+          await asyncio.to_thread(_bot_manager.safe_shutdown)
           break
       if not failure:
         job.state = JobState.succeeded
@@ -185,7 +186,8 @@ async def _jobs_worker():
         steps[-1].error = str(e)
       job.state = JobState.failed
       job.stopped_at_index = steps[-1].index if steps else 0
-      await asyncio.to_thread(safe_shutdown_sync, _robot)
+      # await asyncio.to_thread(safe_shutdown_sync, _robot)
+      await asyncio.to_thread(_bot_manager.safe_shutdown)
     finally:
       job.steps = steps
       job.finished_at = time.time()
@@ -193,6 +195,7 @@ async def _jobs_worker():
       _job_queue.task_done()
       if job.state in (JobState.succeeded, JobState.failed):
         _jobs.pop(job_id, None)
+
 
 @arm_router.post("/initialize")
 async def initialize_arm():
@@ -203,9 +206,10 @@ async def initialize_arm():
     raise HTTPException(500, f"Failed to initialize robot: {exc}") from exc
   return {"status": "initialized"}
 
+
 @arm_router.get("/current-position")
 async def arm_position():
-  return {"current_positions": _robot.core.get_joint_positions()}
+  return {"current_positions": _robot.arm.get_joint_positions()}
 
 
 @arm_router.post("/torque/{desired_state}")
@@ -218,7 +222,8 @@ async def torque(desired_state: TorqueStateEnum):
 
   try:
     if desired_state == TorqueStateEnum.disable:
-      await asyncio.to_thread(safe_shutdown_sync, _robot)
+      # await asyncio.to_thread(safe_shutdown_sync, _robot)
+      await asyncio.to_thread(_bot_manager.safe_shutdown)
       return {
         "status": "success",
         "action": "false",
@@ -254,6 +259,7 @@ async def submit_arm_move(req: ArmMoveRequest):
   await _job_queue.put({'job_id': job_id, 'movements': movements})
   return {"job_id": job_id, "state": job.state}
 
+
 @arm_router.get("/jobs/{job_id}")
 async def get_job(job_id: str):
   job = _jobs.get(job_id)
@@ -261,20 +267,27 @@ async def get_job(job_id: str):
     raise HTTPException(404, "Job not found")
   return job
 
+
 @arm_router.get("/jobs")
 async def list_jobs():
   return list(_jobs.values())[-50:]
 
+
 @arm_router.post("/go-home")
 async def go_home():
+  if _robot is None:
+    raise HTTPException(503, "Robot not initialized")
   try:
-    _robot.core.go_to_home_pose()
+     _robot.arm.go_to_home_pose()
   except Exception as exc:
     raise HTTPException(500, f"Failed to go to home pose: {exc}") from exc
 
+
 @arm_router.post("/go-sleep")
 async def go_sleep():
+  if _robot is None:
+    raise HTTPException(503, "Robot not initialized")
   try:
-    _robot.core.go_to_sleep_pose()
+     _robot.arm.go_to_sleep_pose()
   except Exception as exc:
     raise HTTPException(500, f"Failed to go to sleep pose: {exc}") from exc

@@ -14,8 +14,9 @@ DEFAULT_WAIT_TIME = 1.75 * DEFAULT_MOVING_TIME
 
 WAIST_PICKUP_POSITION = -np.pi/1.89
 WAIST_BOTTLE_POSITION = -np.pi/5.65
+WAIST_POSITION_POST_OPEN_POSITION = -np.pi/2
 WRIST_ROTATE_GRASP = np.pi/2.11
-WRIST_ROTATE_INITIAL = np.pi/3.5
+WRIST_ROTATE_INITIAL = np.pi/3.3
 WRIST_ROTATE_OPEN = np.pi/1.1
 LOWER_DISTANCE = -0.15
 REVERSE_DISTANCE = -0.193
@@ -34,8 +35,8 @@ BRAND_CONFIGS = {
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "corona": {
-        "waist_rotation": -np.pi/4.7,
-        "bottle_lower_distance": -0.182
+        "waist_rotation": -np.pi/4.2,
+        "bottle_lower_distance": -0.185
     }
 }
 
@@ -130,7 +131,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         
         approach_bottle_sequence = MovementSequence("approach_bottle", [
             Movement(MovementType.GO_HOME, {}, "Go to home pose"),
-            Movement(MovementType.POSE_COMPONENTS, {'x': 0.22, 'z': 0.35}, "Move to bottle approach position"),
+            Movement(MovementType.POSE_COMPONENTS, {'x': 0.265, 'z': 0.35}, "Move to bottle approach position"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait at approach position"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_INITIAL}, "Rotate wrist for bottle"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),
@@ -183,7 +184,8 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.25}, "Rotate wrist to open", skip_default_wait=True),
             Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE}, "Raise while opening", skip_default_wait=True),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': DEFAULT_MOVING_TIME}, "Complete opening motion", skip_default_wait=True),
-            Movement(MovementType.WAIT, {'duration': 0.5}, "Wait for opening completion")
+            Movement(MovementType.WAIT, {'duration': 0.5}, "Wait for opening completion"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_POSITION_POST_OPEN_POSITION, 'moving_time': DEFAULT_MOVING_TIME}, "Move away from bottle", skip_default_wait=True),
         ])
     
     def _process_current_state(self) -> bool:
@@ -237,13 +239,6 @@ async def open_beer_state_machine(brand: str, wait_time: float = 2.0):
     """Main function to open a beer bottle using the abstract state machine"""
     from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
     
-    # bot = InterbotixManipulatorXS(
-    #     robot_model='wx250',
-    #     group_name='arm',
-    #     gripper_name='gripper',
-    #     moving_time=DEFAULT_MOVING_TIME,
-    #     gripper_pressure=0.9           
-    # )
     manager = get_robot_manager()
     bot = await manager.get_robot()
 
