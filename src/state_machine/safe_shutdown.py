@@ -1,4 +1,5 @@
 import time
+from interbotix_common_modules.common_robot.robot import robot_shutdown
 
 def safe_shutdown_sync(bot: 'InterbotixManipulatorXS') -> bool:
     """Safely release gripper, go home, go sleep, disable torque.
@@ -27,6 +28,7 @@ def safe_shutdown_sync(bot: 'InterbotixManipulatorXS') -> bool:
         bot.core.robot_reboot_motors(cmd_type='group', name='all', enable=False, smart_reboot=True)
         bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
         print("[safe_shutdown] Torque disabled")
+        robot_shutdown()
         return True
     except Exception as e:
         print(f"[safe_shutdown] Warning torque disable: {e}")
