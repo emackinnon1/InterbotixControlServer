@@ -96,15 +96,15 @@ class RobotConnectionManager:
         services = [line.strip() for line in stdout.decode().splitlines() if line.strip()]
         return services
 
-    async def safe_shutdown(self) -> bool:
+    async def safe_shutdown(self, full_shutdown=True) -> bool:
         async with self._lock:
             if self._robot is None:
                 return True
             bot = self._robot
             self._robot = None
-        return self._safe_shutdown_sync()
+        return self._safe_shutdown_sync(full_shutdown)
 
-    def _safe_shutdown_sync(self) -> bool:
+    def _safe_shutdown_sync(self, full_shutdown) -> bool:
         """Safely release gripper, go home, go sleep, disable torque.
         Returns True if torque disable step succeeds; False otherwise.
         Any intermediate errors are logged but do not abort sequence.
@@ -131,7 +131,8 @@ class RobotConnectionManager:
             _robot.core.robot_reboot_motors(cmd_type='group', name='all', enable=False, smart_reboot=True)
             _robot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
             print("[safe_shutdown] Torque disabled")
-            robot_shutdown()
+            if full_shutdown:
+                robot_shutdown()
             return True
         except Exception as e:
             print(f"[safe_shutdown] Warning torque disable: {e}")
