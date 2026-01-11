@@ -61,9 +61,8 @@ class StateMachineManager:
             #     moving_time=DEFAULT_MOVING_TIME,
             #     gripper_pressure=0.85
             # )
-            manager = get_robot_manager()
-            self._robot = await manager.get_robot()
-            robot_startup()
+            self._manager = get_robot_manager()
+            self._robot = await self._manager.get_robot()
             
             return True
             
