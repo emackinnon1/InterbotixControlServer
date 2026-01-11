@@ -53,14 +53,7 @@ class StateMachineManager:
         try:
             if self._robot is not None:
                 return True
-                
-            # self._robot = InterbotixManipulatorXS(
-            #     robot_model=robot_model,
-            #     group_name='arm',
-            #     gripper_name='gripper',
-            #     moving_time=DEFAULT_MOVING_TIME,
-            #     gripper_pressure=0.85
-            # )
+
             self._manager = get_robot_manager()
             self._robot = await self._manager.get_robot()
             
