@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException
-from src.state_machine.state_machine_manager import StateMachineManager
+from src.state_machine.state_machine_deps import StateMachineManager
 
 def get_state_machine_manager() -> StateMachineManager:
     """Dependency to get the singleton state machine manager"""
