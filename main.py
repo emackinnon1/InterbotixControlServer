@@ -10,7 +10,7 @@ from src.routers.arm import arm_router
 from src.routers.ros import ros_router
 from src.routers.state_machine import state_machine_router
 from src.state_machine.safe_shutdown import safe_shutdown_sync
-from src.state_machine.state_machine_manager import StateMachineManager
+from src.dependencies.state_machine_manager import get_state_machine_manager
 
 
 
@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
     bot_manager = get_robot_manager()
     bot = await bot_manager.get_robot()
     await asyncio.to_thread(safe_shutdown_sync, bot)
-    state_machine_manager = StateMachineManager()
+    state_machine_manager = get_state_machine_manager()
     state_machine_manager.cleanup()
     await ros_manager.stop_ros_launch()
 
