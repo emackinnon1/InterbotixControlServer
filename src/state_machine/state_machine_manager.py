@@ -48,7 +48,7 @@ class StateMachineManager:
             self._execution_thread: Optional[threading.Thread] = None
             self._stop_requested = False
     
-    def initialize_robot(self, robot_model: str = 'wx250') -> bool:
+    async def initialize_robot(self, robot_model: str = 'wx250') -> bool:
         """Initialize the robot connection"""
         try:
             if self._robot is not None:

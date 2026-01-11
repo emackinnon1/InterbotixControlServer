@@ -1,3 +1,4 @@
+import asyncio
 import time
 from enum import Enum, auto
 from typing import Dict
@@ -232,7 +233,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             self._safe_shutdown_sequence()
             return False
 
-def open_beer_state_machine(brand: str, wait_time: float = 2.0):
+async def open_beer_state_machine(brand: str, wait_time: float = 2.0):
     """Main function to open a beer bottle using the abstract state machine"""
     from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
     
@@ -251,4 +252,4 @@ def open_beer_state_machine(brand: str, wait_time: float = 2.0):
     return state_machine.run_with_robot_management()
 
 if __name__ == '__main__':
-    open_beer_state_machine("heineken")
+    asyncio.run(open_beer_state_machine("heineken"))
