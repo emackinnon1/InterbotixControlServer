@@ -8,10 +8,12 @@ import time
 import uuid
 import logging
 
+from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+
 from src.state_machine.abstract_state_machine import Movement, MovementType, MovementExecutor
 from src.state_machine.safe_shutdown import safe_shutdown_sync
 from src.dependencies.robot_manager import get_robot_manager
-from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -80,7 +82,7 @@ class ArmMoveJobStatus(BaseModel):
   elapsed_ms: Optional[int] = None
 
 # Globals
-_robot: Optional[InterbotixManipulatorXS] = None
+_robot: Optional[InterbotixManipulatorXS] = asyncio.create_task(_init_robot())
 _job_queue: "asyncio.Queue[dict]" = asyncio.Queue()
 _jobs: Dict[str, ArmMoveJobStatus] = {}
 _worker_task: Optional[asyncio.Task] = None
@@ -89,8 +91,7 @@ _worker_lock = asyncio.Lock()
 async def _init_robot():
   global _robot
   if _robot is None:
-    manager = get_robot_manager()
-    _robot = await manager.get_robot()
+    _robot = await _bot_manager.get_robot()
 
 async def _start_worker():
   global _worker_task
@@ -267,6 +268,8 @@ async def list_jobs():
 
 @arm_router.post("/go-home")
 async def go_home():
+  if _robot is None:
+    raise HTTPException(503, "Robot not initialized")
   try:
      await asyncio.to_thread(_robot.arm.go_to_home_pose())
   except Exception as exc:
@@ -274,6 +277,8 @@ async def go_home():
 
 @arm_router.post("/go-sleep")
 async def go_sleep():
+  if _robot is None:
+    raise HTTPException(503, "Robot not initialized")
   try:
      await asyncio.to_thread(_robot.arm.go_to_sleep_pose())
   except Exception as exc:
