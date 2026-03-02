@@ -31,7 +31,7 @@ BRAND_CONFIGS = {
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "heineken": {
-        "waist_rotation": -np.pi/4.7,
+        "waist_rotation": -np.pi/4.2,
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "corona": {
