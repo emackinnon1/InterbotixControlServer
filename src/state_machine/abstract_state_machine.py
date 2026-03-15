@@ -137,6 +137,7 @@ class AbstractStateMachine(Generic[StateType], ABC):
         """Run the complete state machine with proper robot initialization and cleanup"""
         try:
             # Initialize robot
+            self.bot.arm.go_to_sleep_pose()
             self.bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
             self.bot.core.robot_reboot_motors(cmd_type='group', name='all', enable=False, smart_reboot=True)
             self.bot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
