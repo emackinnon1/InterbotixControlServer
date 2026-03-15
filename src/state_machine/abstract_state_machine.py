@@ -5,7 +5,6 @@ from enum import Enum, auto
 from typing import Dict, List, Any, Optional, TypeVar, Generic
 from dataclasses import dataclass
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
-from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_startup
 
 StateType = TypeVar('StateType', bound=Enum)
 
