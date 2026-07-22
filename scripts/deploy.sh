@@ -3,7 +3,7 @@
 set -e  # Exit on any error
 
 # Allow override but ensure a default HTTP health-check delay
-HTTP_CHECK_DELAY="${HTTP_CHECK_DELAY:-8}"
+HTTP_CHECK_DELAY="${HTTP_CHECK_DELAY:-10}"
 
 echo "=== InterbotixControlServer Deployment Script ==="
 
