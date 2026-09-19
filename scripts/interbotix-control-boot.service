@@ -1,0 +1,14 @@
+[Unit]
+Description=InterbotixControlServer boot deployment
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/InterbotixControlServer
+ExecStart=%h/InterbotixControlServer/scripts/start-on-boot.sh
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
