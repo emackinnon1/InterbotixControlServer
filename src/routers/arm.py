@@ -98,6 +98,22 @@ async def _start_worker():
     if _worker_task is None:
       _worker_task = asyncio.create_task(_jobs_worker())
 
+async def initialize_arm_resources():
+  await _init_robot()
+  await _start_worker()
+
+async def shutdown_arm_resources():
+  global _worker_task
+  if _worker_task is None:
+    return
+  _worker_task.cancel()
+  try:
+    await _worker_task
+  except asyncio.CancelledError:
+    pass
+  finally:
+    _worker_task = None
+
 def _validate_params(cmd: MovementCommandInput):
   t = cmd.type
   p = cmd.params
@@ -200,8 +216,7 @@ async def _jobs_worker():
 @arm_router.post("/initialize")
 async def initialize_arm():
   try:
-    await _init_robot()
-    await _start_worker()
+    await initialize_arm_resources()
   except Exception as exc:  # noqa: BLE001
     raise HTTPException(500, f"Failed to initialize robot: {exc}") from exc
   return {"status": "initialized"}
@@ -243,6 +258,7 @@ async def torque(desired_state: TorqueStateEnum):
 async def submit_arm_move(req: ArmMoveRequest):
   if _robot is None:
     raise HTTPException(503, "Robot not initialized")
+  await _start_worker()
   try:
     cmds = [req.command] if req.command else req.commands
     movements = _map_to_movements(cmds, req.moving_time, req.go_home_first)

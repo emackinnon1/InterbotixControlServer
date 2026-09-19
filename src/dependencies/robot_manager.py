@@ -102,34 +102,34 @@ class RobotConnectionManager:
                 return True
             bot = self._robot
             self._robot = None
-        return self._safe_shutdown_sync(full_shutdown)
+        return await asyncio.to_thread(self._safe_shutdown_sync, bot, full_shutdown)
 
-    def _safe_shutdown_sync(self, full_shutdown) -> bool:
+    def _safe_shutdown_sync(self, bot, full_shutdown) -> bool:
         """Safely release gripper, go home, go sleep, disable torque.
         Returns True if torque disable step succeeds; False otherwise.
         Any intermediate errors are logged but do not abort sequence.
         """
         try:
-            _robot.gripper.release()
+            bot.gripper.release()
             print("[safe_shutdown] Gripper released")
             time.sleep(0.5)
         except Exception as e:
             print(f"[safe_shutdown] Warning release gripper: {e}")
         try:
-            _robot.arm.go_to_home_pose(moving_time=2.0)
+            bot.arm.go_to_home_pose(moving_time=2.0)
             print("[safe_shutdown] Home pose reached")
             time.sleep(1.0)
         except Exception as e:
             print(f"[safe_shutdown] Warning home pose: {e}")
         try:
-            _robot.arm.go_to_sleep_pose(moving_time=2.0)
+            bot.arm.go_to_sleep_pose(moving_time=2.0)
             print("[safe_shutdown] Sleep pose reached")
             time.sleep(1.0)
         except Exception as e:
             print(f"[safe_shutdown] Warning sleep pose: {e}")
         try:
-            _robot.core.robot_reboot_motors(cmd_type='group', name='all', enable=False, smart_reboot=True)
-            _robot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
+            bot.core.robot_reboot_motors(cmd_type='group', name='all', enable=False, smart_reboot=True)
+            bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
             print("[safe_shutdown] Torque disabled")
             if full_shutdown:
                 robot_shutdown()

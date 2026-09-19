@@ -78,11 +78,11 @@ class StateMachineManager:
     def create_state_machine(self, state_machine_class, **kwargs) -> bool:
         """Create a new state machine instance"""
         try:
-            if not self.initialize_robot():
-                return False
-            
+            if self._robot is None:
+                raise RuntimeError("Robot not initialized")
+
             if self._status.is_running:
-                raise RuntimeError("Cannot create new state machine while another is running")
+                return False
             
             self._current_state_machine = state_machine_class(self._robot, **kwargs)
             self._update_status()
