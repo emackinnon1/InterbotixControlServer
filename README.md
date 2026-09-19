@@ -38,14 +38,11 @@ uv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 Run cleanup and deployment automatically when the user session starts:
 ```bash
-mkdir -p ~/.config/systemd/user
-cp scripts/interbotix-control-boot.service ~/.config/systemd/user/
-chmod +x scripts/cleanup.sh scripts/deploy.sh scripts/start-on-boot.sh
-systemctl --user disable --now interbotix-control.service 2>/dev/null || true
-systemctl --user daemon-reload
-systemctl --user enable --now interbotix-control-boot.service
-sudo loginctl enable-linger "$USER"
+./scripts/install-boot-service.sh
 ```
+
+Run the installer as the service user from the repository directory. It installs the user service,
+disables the legacy direct-Uvicorn service, enables the boot deployment, and configures user lingering.
 
 Check the boot deployment logs with:
 ```bash
