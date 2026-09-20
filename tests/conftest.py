@@ -137,10 +137,14 @@ def client(monkeypatch):
     app_module.app.dependency_overrides[state_getter] = lambda: fake_state_manager
     app_module.app.dependency_overrides[ready_state_getter] = lambda: fake_state_manager
 
+    original_task_functions = dict(task_module.TASK_FUNCTIONS)
     task_module.TASK_FUNCTIONS["open_beer_bottle"] = lambda beer_brand: {"beer_brand": beer_brand}
     task_module.TASK_FUNCTIONS["open_beer_state_machine"] = lambda beer_brand: {"beer_brand": beer_brand}
 
-    with TestClient(app_module.app) as test_client:
-        yield test_client
-
-    app_module.app.dependency_overrides.clear()
+    try:
+        with TestClient(app_module.app) as test_client:
+            yield test_client
+    finally:
+        app_module.app.dependency_overrides.clear()
+        task_module.TASK_FUNCTIONS.clear()
+        task_module.TASK_FUNCTIONS.update(original_task_functions)
