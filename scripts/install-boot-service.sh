@@ -36,7 +36,11 @@ systemctl --user enable --now "$SERVICE_NAME"
 
 if command -v loginctl >/dev/null 2>&1; then
     printf 'Enabling user lingering so the service can start without an interactive login...\n'
-    sudo loginctl enable-linger "$USER"
+    if command -v sudo >/dev/null 2>&1; then
+        sudo -n loginctl enable-linger "$USER" || printf 'Warning: failed to enable lingering; service may not start until you log in.\n' >&2
+    else
+        printf 'Warning: sudo not found; cannot enable lingering. Service may not start until you log in.\n' >&2
+    fi
 fi
 
 printf '\nInstallation complete.\n'
