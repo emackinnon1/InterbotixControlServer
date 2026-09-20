@@ -122,7 +122,7 @@ def client(monkeypatch):
     monkeypatch.setattr(app_module, "get_ros_manager", lambda: fake_ros)
     monkeypatch.setattr(app_module, "get_robot_manager", lambda: fake_bot)
     monkeypatch.setattr(app_module, "get_state_machine_manager", lambda: fake_state_manager)
-    monkeypatch.setattr(app_module, "initialize_arm_resources", lambda: None)
+
     async def _async_initialize_arm_resources():
         return None
 
