@@ -183,6 +183,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for positioning"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.3}, "Rotate wrist to open", skip_default_wait=True),
             Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE, 'moving_time': 0.3}, "Raise while opening", skip_default_wait=True),
+            Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE, 'moving_time': 0.3}, "Raise while opening", skip_default_wait=True),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_BOTTLE_POSITION, 'moving_time': DEFAULT_MOVING_TIME}, "Complete opening motion", skip_default_wait=True),
             Movement(MovementType.WAIT, {'duration': 0.5}, "Wait for opening completion"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_POSITION_POST_OPEN_POSITION, 'moving_time': DEFAULT_MOVING_TIME}, "Move away from bottle", skip_default_wait=True),
