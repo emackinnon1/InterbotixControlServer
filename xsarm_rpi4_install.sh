@@ -13,13 +13,15 @@ RRE="${NORM}${OFF}"
 
 PROMPT="> "
 
-ALL_VALID_DISTROS=('melodic' 'noetic' 'galactic' 'humble' 'rolling')
+ALL_VALID_DISTROS=('melodic' 'noetic' 'galactic' 'humble' 'jazzy' 'lyrical' 'rolling')
 ROS1_VALID_DISTROS=('melodic' 'noetic')
-ROS2_VALID_DISTROS=('galactic' 'humble' 'rolling')
+ROS2_VALID_DISTROS=('galactic' 'humble' 'jazzy' 'lyrical' 'rolling')
 
 BIONIC_VALID_DISTROS=('melodic')
 FOCAL_VALID_DISTROS=('noetic' 'galactic')
 JAMMY_VALID_DISTROS=('humble' 'rolling')
+NOBLE_VALID_DISTROS=('jazzy')
+RESOLUTE_VALID_DISTROS=('lyrical')
 
 NONINTERACTIVE=false
 INSTALL_PATH=~/InterbotixControlServer/workspace
@@ -36,7 +38,7 @@ Options:
   -d DISTRO       Install the DISTRO ROS distro compatible with your Ubuntu version. See
                   'https://github.com/Interbotix/.github/blob/main/SECURITY.md' for the list of
                   supported distributions. If not given, installs the ROS 1 distro compatible with
-                  your Ubuntu version, or the stable ROS 2 distro if using Ubuntu 22.04 or later.
+                  your Ubuntu version, or the ROS 2 distro paired with Ubuntu 22.04, 24.04, or 26.04.
 
   -p PATH         Sets the absolute install location for the Interbotix workspace. If not specified,
                   the Interbotix workspace directory will default to '~/interbotix_ws'.
@@ -51,9 +53,8 @@ Examples:
     This will display this help message and quit.
 
   ./xsarm_rpi4_install.sh
-    This will install just the ROS 1 distro compatible with your Ubuntu version, or the stable ROS 2
-    distro if using Ubuntu 22.04 or later. It will prompt you to ask if you want to install certain
-    packages and dependencies.
+    This will install the ROS distro paired with your Ubuntu version. It will prompt you to ask if
+    you want to install certain packages and dependencies.
 
   ./xsarm_rpi4_install.sh ${BOLD}-p ~/custom_ws${NORM}
     Installs the Interbotix packages under the '~/custom_ws' path."
@@ -129,8 +130,24 @@ function check_ubuntu_version() {
       fi
       ;;
 
+    24.04 )
+      if contains_element "$ROS_DISTRO_TO_INSTALL" "${NOBLE_VALID_DISTROS[@]}"; then
+        PY_VERSION=3
+      else
+        failed "Chosen ROS distribution '$ROS_DISTRO_TO_INSTALL' is not supported on Ubuntu ${UBUNTU_VERSION}."
+      fi
+      ;;
+
+    26.04 )
+      if contains_element "$ROS_DISTRO_TO_INSTALL" "${RESOLUTE_VALID_DISTROS[@]}"; then
+        PY_VERSION=3
+      else
+        failed "Chosen ROS distribution '$ROS_DISTRO_TO_INSTALL' is not supported on Ubuntu ${UBUNTU_VERSION}."
+      fi
+      ;;
+
     *)
-      failed "Something went wrong. UBUNTU_VERSION='$UBUNTU_VERSION', should be 18.04, 20.04, or 22.04."
+      failed "Unsupported Ubuntu version '$UBUNTU_VERSION'; supported versions are 18.04, 20.04, 22.04, 24.04, and 26.04."
       ;;
 
   esac
@@ -138,16 +155,26 @@ function check_ubuntu_version() {
 
 function install_essential_packages() {
   # Install necessary core packages
+  local pip_install_args=()
+  if [[ "$UBUNTU_VERSION" == "24.04" || "$UBUNTU_VERSION" == "26.04" ]]; then
+    pip_install_args=(--user --break-system-packages)
+  fi
+
   sudo apt-get install -yq curl git
   if [ $ROS_VERSION_TO_INSTALL == 2 ]; then
-    sudo pip3 install transforms3d
+    sudo apt-get install -yq python3-pip
+    if [[ ${#pip_install_args[@]} -gt 0 ]]; then
+      python3 -m pip install "${pip_install_args[@]}" transforms3d
+    else
+      sudo pip3 install transforms3d
+    fi
   fi
   if [ $PY_VERSION == 2 ]; then
     sudo apt-get install -yq python-pip
     python -m pip install modern_robotics
   elif [ $PY_VERSION == 3 ]; then
     sudo apt-get install -yq python3-pip
-    python3 -m pip install modern_robotics
+    python3 -m pip install "${pip_install_args[@]}" modern_robotics
   else
     failed "Something went wrong. PY_VERSION='$PY_VERSION', should be 2 or 3."
   fi
@@ -229,6 +256,12 @@ function install_ros1() {
 
 function install_ros2() {
   # Install ROS 2
+  local interbotix_branch="$ROS_DISTRO_TO_INSTALL"
+  if [[ "$ROS_DISTRO_TO_INSTALL" == "lyrical" ]]; then
+    interbotix_branch="rolling"
+    echo -e "${BLU}${BOLD}Lyrical is experimental: building Interbotix packages from their rolling branches.${NORM}${OFF}"
+  fi
+
   if [ "$(dpkg-query -W -f='${Status}' ros-"$ROS_DISTRO_TO_INSTALL"-desktop 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
     echo -e "${GRN}Installing ROS 2 $ROS_DISTRO_TO_INSTALL desktop...${OFF}"
     sudo apt-get install -yq      \
@@ -274,9 +307,9 @@ function install_ros2() {
   else
     echo -e "${GRN}Installing ROS 2 packages for the Interbotix Arm...${OFF}"
     cd $INSTALL_PATH/src
-    git clone -b "$ROS_DISTRO_TO_INSTALL" https://github.com/Interbotix/interbotix_ros_core.git
-    git clone -b "$ROS_DISTRO_TO_INSTALL" https://github.com/Interbotix/interbotix_ros_manipulators.git
-    git clone -b "$ROS_DISTRO_TO_INSTALL" https://github.com/Interbotix/interbotix_ros_toolboxes.git
+    git clone -b "$interbotix_branch" https://github.com/Interbotix/interbotix_ros_core.git
+    git clone -b "$interbotix_branch" https://github.com/Interbotix/interbotix_ros_manipulators.git
+    git clone -b "$interbotix_branch" https://github.com/Interbotix/interbotix_ros_toolboxes.git
     # TODO(lsinterbotix) remove below when moveit_visual_tools is available in apt repo
     git clone -b ros2 https://github.com/ros-planning/moveit_visual_tools.git
     rm                                                                                                  \
@@ -341,9 +374,13 @@ if [ "$DISTRO_SET_FROM_CL" = false ]; then
     ROS_DISTRO_TO_INSTALL="noetic"
   elif [ "$UBUNTU_VERSION" == "22.04" ]; then
     ROS_DISTRO_TO_INSTALL="humble"
+  elif [ "$UBUNTU_VERSION" == "24.04" ]; then
+    ROS_DISTRO_TO_INSTALL="jazzy"
+  elif [ "$UBUNTU_VERSION" == "26.04" ]; then
+    ROS_DISTRO_TO_INSTALL="lyrical"
   else
     echo -e "${BOLD}${RED}Unsupported Ubuntu version: $UBUNTU_VERSION.${NORM}${OFF}"
-    failed "Interbotix Arm only works with Ubuntu 18.04 Bionic, 20.04 Focal, or 22.04 Jammy on the Raspberry Pi"
+    failed "Supported Ubuntu versions are 18.04 Bionic, 20.04 Focal, 22.04 Jammy, 24.04 Noble, and 26.04 Resolute."
   fi
 fi
 

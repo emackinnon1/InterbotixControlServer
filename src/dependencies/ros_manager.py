@@ -45,7 +45,8 @@ class ROSLaunchManager:
             "xsarm_control.launch.py", 
             f"robot_model:={robot_model}"
         ]
-        self.ros_root = "/opt/ros/humble"
+        ros_distro = os.environ.get("ROS_DISTRO", "humble")
+        self.ros_root = f"/opt/ros/{ros_distro}"
         self.recent_log_lines: list[str] = []  # Store recent log lines for error checking
         self.max_recent_log_lines: int = 100  # Limit for stored log lines
     
