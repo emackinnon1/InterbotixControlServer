@@ -1,7 +1,7 @@
 # Interbotix Control Server
 
 ## Getting started
-In order to get this application up and running, the `xsarm_rpi4_install.sh` script should be run (a modified version of the one found [here](https://docs.trossenrobotics.com/interbotix_xsarms_docs/ros_interface/ros2/raspberry_pi_setup.html)). The install path will default to `InterbotixControlServer/workspace` and will install all necessary ROS packages. Ubuntu 24.04/Jazzy and 26.04/Lyrical are experimental additions; Lyrical currently builds Interbotix sources from their rolling branches.
+In order to get this application up and running, the `xsarm_rpi_install.sh` script should be run (a modified version of the one found [here](https://docs.trossenrobotics.com/interbotix_xsarms_docs/ros_interface/ros2/raspberry_pi_setup.html)). The install path will default to `InterbotixControlServer/workspace` and will install all necessary ros packages.
 
 The FastAPI lifespan starts ROS, initializes the robot, and starts the arm movement worker automatically. Robot initialization endpoints remain available for compatibility but are not required before sending movement or state-machine commands. On shutdown, active execution is stopped, the arm is safely shut down, and ROS is stopped.
 
@@ -10,7 +10,7 @@ If the ROS build enters a broken state, sometimes the easiest solution is to do 
 ```bash
 sudo apt-get remove "ros-${ROS_DISTRO:-humble}-desktop" && sudo apt-get autoremove
 ```
-Then, run the `xsarm_rpi4_install.sh` again.
+Then, run the `xsarm_rpi_install.sh` again.
 
 
 ## Miscellanious info:

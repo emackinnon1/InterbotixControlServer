@@ -13,7 +13,7 @@ clean:
 	bash scripts/cleanup.sh
 
 install:
-	bash xsarm_rpi4_install.sh
+	bash xsarm_rpi_install.sh
 
 install-boot-service:
 	bash scripts/install-boot-service.sh
