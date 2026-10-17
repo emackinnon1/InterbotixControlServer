@@ -1,18 +1,15 @@
 [Unit]
 Description=InterbotixControlServer FastAPI Application
-After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/emackinnon1/InterbotixControlServer
-Environment=PATH=/home/emackinnon1/InterbotixControlServer/.venv/bin:/snap/astral-uv/929/bin:/usr/local/bin:/usr/bin:/bin
-Environment=PYTHONPATH=/home/emackinnon1/InterbotixControlServer
 WorkingDirectory=%h/InterbotixControlServer
-Environment=PATH=%h/InterbotixControlServer/.venv/bin:/snap/bin:/usr/local/bin:/usr/bin:/bin
 Environment=PYTHONPATH=%h/InterbotixControlServer
-ExecStart=/snap/bin/uv run uvicorn main:app --host 0.0.0.0 --port 8000
-Restart=always
+Environment=ROS_DISTRO=jazzy
+ExecStart=/usr/bin/bash %h/InterbotixControlServer/scripts/run-server.sh
+Restart=on-failure
 RestartSec=3
+TimeoutStopSec=30
 StandardOutput=journal
 StandardError=journal
 

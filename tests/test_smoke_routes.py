@@ -3,12 +3,21 @@ from fastapi import status
 from pydantic import ValidationError
 
 from src.routers.arm import ArmMoveRequest
+from src.dependencies.ros_manager import ROSLaunchManager
 
 
 def test_root_endpoint(client):
     response = client.get("/")
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {"message": "Interbotix Control Server is running"}
+
+
+def test_ros_manager_uses_active_ros_distro(monkeypatch):
+    monkeypatch.setenv("ROS_DISTRO", "jazzy")
+
+    manager = ROSLaunchManager()
+
+    assert manager.ros_root == "/opt/ros/jazzy"
 
 
 def test_ros_status_endpoint(client):

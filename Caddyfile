@@ -1,4 +1,4 @@
-rpi4-widowx250.local {
+rpi5-beerbot.local {
 	reverse_proxy localhost:8000
 	tls internal
 }

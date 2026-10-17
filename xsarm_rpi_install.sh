@@ -13,12 +13,8 @@ RRE="${NORM}${OFF}"
 
 PROMPT="> "
 
-ALL_VALID_DISTROS=('melodic' 'noetic' 'galactic' 'humble' 'jazzy' 'lyrical' 'rolling')
-ROS1_VALID_DISTROS=('melodic' 'noetic')
-ROS2_VALID_DISTROS=('galactic' 'humble' 'jazzy' 'lyrical' 'rolling')
+ALL_VALID_DISTROS=('humble' 'jazzy' 'lyrical' 'rolling')
 
-BIONIC_VALID_DISTROS=('melodic')
-FOCAL_VALID_DISTROS=('noetic' 'galactic')
 JAMMY_VALID_DISTROS=('humble' 'rolling')
 NOBLE_VALID_DISTROS=('jazzy')
 RESOLUTE_VALID_DISTROS=('lyrical')
@@ -26,8 +22,9 @@ RESOLUTE_VALID_DISTROS=('lyrical')
 NONINTERACTIVE=false
 INSTALL_PATH=~/InterbotixControlServer/workspace
 DISTRO_SET_FROM_CL=false
+GITHUB_SOURCE=emackinnon1
 
-_usage="${BOLD}USAGE: ./xsarm_rpi_install.sh [-h][-d DISTRO][-p PATH][-n]${NORM}
+_usage="${BOLD}USAGE: ./xsarm_rpi_install.sh [-h][-d DISTRO][-p PATH][-s SOURCE][-n]${NORM}
 
 Install the Interbotix X-Series Arms Raspberry Pi packages and their dependencies.
 
@@ -37,11 +34,13 @@ Options:
 
   -d DISTRO       Install the DISTRO ROS distro compatible with your Ubuntu version. See
                   'https://github.com/Interbotix/.github/blob/main/SECURITY.md' for the list of
-                  supported distributions. If not given, installs the ROS 1 distro compatible with
-                  your Ubuntu version, or the ROS 2 distro paired with Ubuntu 22.04, 24.04, or 26.04.
+                  supported distributions. If not given, installs the ROS 2 distro paired with
+                  Ubuntu 22.04, 24.04, or 26.04.
 
   -p PATH         Sets the absolute install location for the Interbotix workspace. If not specified,
                   the Interbotix workspace directory will default to '~/InterbotixControlServer/workspace'.
+
+  -s SOURCE       GitHub source for Interbotix repositories: emackinnon1 or Interbotix. Defaults to emackinnon1.
 
   -n              Install all packages without prompting. This is useful
                   if you're running this script in a non-interactive terminal like when building a
@@ -117,6 +116,18 @@ function ensure_repository() {
   git clone -b "$branch" "$repository_url" "$repository_path" || failed "Failed to clone '$repository_url'."
 }
 
+function configure_submodule_sources() {
+  local repository_path="$1"
+  local submodule_key submodule_url
+
+  while read -r submodule_key submodule_url; do
+    if [[ "$submodule_url" == https://github.com/Interbotix/* ]]; then
+      submodule_url="${submodule_url/Interbotix/$GITHUB_SOURCE}"
+      git -C "$repository_path" config "$submodule_key" "$submodule_url"
+    fi
+  done < <(git -C "$repository_path" config -f .gitmodules --get-regexp '^submodule\..*\.url$' 2>/dev/null || true)
+}
+
 function ensure_submodule() {
   local repository_path="$1"
   local submodule_path="$2"
@@ -142,11 +153,7 @@ function setup_shell_profile() {
   local ros_setup_quoted workspace_setup_quoted
 
   ros_setup="/opt/ros/$ROS_DISTRO_TO_INSTALL/setup.bash"
-  if [[ "$ROS_VERSION_TO_INSTALL" == "1" ]]; then
-    workspace_setup="$INSTALL_PATH/devel/setup.bash"
-  else
-    workspace_setup="$INSTALL_PATH/install/setup.bash"
-  fi
+  workspace_setup="$INSTALL_PATH/install/setup.bash"
   printf -v ros_setup_quoted '%q' "$ros_setup"
   printf -v workspace_setup_quoted '%q' "$workspace_setup"
 
@@ -182,19 +189,8 @@ if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
 fi
 
 function validate_distro() {
-  # check if chosen distro is valid and set ROS major version
   if contains_element "$ROS_DISTRO_TO_INSTALL" "${ALL_VALID_DISTROS[@]}"; then
-    if contains_element "$ROS_DISTRO_TO_INSTALL" "${ROS1_VALID_DISTROS[@]}"; then
-      # Supported ROS 1 distros
-      ROS_VERSION_TO_INSTALL=1
-    elif contains_element "$ROS_DISTRO_TO_INSTALL" "${ROS2_VALID_DISTROS[@]}"; then
-      # Supported ROS 2 distros
-      ROS_VERSION_TO_INSTALL=2
-    else
-      # For cases where it passes the first check but somehow fails the second check
-      failed "Something went wrong. ROS_DISTRO_TO_INSTALL=$ROS_DISTRO_TO_INSTALL."
-    fi
-    echo -e "${GRN}${BOLD}Chosen Version: ROS ${ROS_VERSION_TO_INSTALL} $ROS_DISTRO_TO_INSTALL${NORM}${OFF}"
+    echo -e "${GRN}${BOLD}Chosen Version: ROS 2 $ROS_DISTRO_TO_INSTALL${NORM}${OFF}"
     return 0
   else
     failed "'$ROS_DISTRO_TO_INSTALL' is not a valid ROS Distribution. Choose one of: '${ALL_VALID_DISTROS[*]}'"
@@ -205,48 +201,26 @@ function check_ubuntu_version() {
  # check if the chosen distribution is compatible with the Ubuntu version
   case $UBUNTU_VERSION in
 
-    18.04 )
-      if contains_element "$ROS_DISTRO_TO_INSTALL" "${BIONIC_VALID_DISTROS[@]}"; then
-        PY_VERSION=2
-      else
-        failed "Chosen ROS distribution '$ROS_DISTRO_TO_INSTALL' is not supported on Ubuntu ${UBUNTU_VERSION}."
-      fi
-      ;;
-
-    20.04 )
-      if contains_element "$ROS_DISTRO_TO_INSTALL" "${FOCAL_VALID_DISTROS[@]}"; then
-        PY_VERSION=3
-      else
-        failed "Chosen ROS distribution '$ROS_DISTRO_TO_INSTALL' is not supported on Ubuntu ${UBUNTU_VERSION}."
-      fi
-      ;;
-
     22.04 )
-      if contains_element "$ROS_DISTRO_TO_INSTALL" "${JAMMY_VALID_DISTROS[@]}"; then
-        PY_VERSION=3
-      else
+      if ! contains_element "$ROS_DISTRO_TO_INSTALL" "${JAMMY_VALID_DISTROS[@]}"; then
         failed "Chosen ROS distribution '$ROS_DISTRO_TO_INSTALL' is not supported on Ubuntu ${UBUNTU_VERSION}."
       fi
       ;;
 
     24.04 )
-      if contains_element "$ROS_DISTRO_TO_INSTALL" "${NOBLE_VALID_DISTROS[@]}"; then
-        PY_VERSION=3
-      else
+      if ! contains_element "$ROS_DISTRO_TO_INSTALL" "${NOBLE_VALID_DISTROS[@]}"; then
         failed "Chosen ROS distribution '$ROS_DISTRO_TO_INSTALL' is not supported on Ubuntu ${UBUNTU_VERSION}."
       fi
       ;;
 
     26.04 )
-      if contains_element "$ROS_DISTRO_TO_INSTALL" "${RESOLUTE_VALID_DISTROS[@]}"; then
-        PY_VERSION=3
-      else
+      if ! contains_element "$ROS_DISTRO_TO_INSTALL" "${RESOLUTE_VALID_DISTROS[@]}"; then
         failed "Chosen ROS distribution '$ROS_DISTRO_TO_INSTALL' is not supported on Ubuntu ${UBUNTU_VERSION}."
       fi
       ;;
 
     *)
-      failed "Unsupported Ubuntu version '$UBUNTU_VERSION'; supported versions are 18.04, 20.04, 22.04, 24.04, and 26.04."
+      failed "Unsupported Ubuntu version '$UBUNTU_VERSION'; supported versions are 22.04, 24.04, and 26.04."
       ;;
 
   esac
@@ -259,97 +233,13 @@ function install_essential_packages() {
     pip_install_args=(--user --break-system-packages)
   fi
 
-  sudo apt-get install -yq curl git
-  if [ $ROS_VERSION_TO_INSTALL == 2 ]; then
-    sudo apt-get install -yq python3-pip
-    if [[ ${#pip_install_args[@]} -gt 0 ]]; then
-      python3 -m pip install "${pip_install_args[@]}" transforms3d
-    else
-      sudo pip3 install transforms3d
-    fi
-  fi
-  if [ $PY_VERSION == 2 ]; then
-    sudo apt-get install -yq python-pip
-    python -m pip install modern_robotics
-  elif [ $PY_VERSION == 3 ]; then
-    sudo apt-get install -yq python3-pip
-    python3 -m pip install "${pip_install_args[@]}" modern_robotics
+  sudo apt-get install -yq curl git python3-pip
+  if [[ ${#pip_install_args[@]} -gt 0 ]]; then
+    python3 -m pip install "${pip_install_args[@]}" transforms3d
   else
-    failed "Something went wrong. PY_VERSION='$PY_VERSION', should be 2 or 3."
+    sudo pip3 install transforms3d
   fi
-}
-
-function install_ros1() {
-  # Install ROS 1
-  if [ "$(dpkg-query -W -f='${Status}' ros-"$ROS_DISTRO_TO_INSTALL"-desktop-full 2>/dev/null | grep -c "ok installed")" -eq 0 ]; then
-    echo -e "${GRN}Installing ROS 1 $ROS_DISTRO_TO_INSTALL desktop...${OFF}"
-    local ros1_repository_entry
-    ros1_repository_entry="deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
-    if [[ ! -f /etc/apt/sources.list.d/ros-latest.list ]] || \
-       [[ "$(cat /etc/apt/sources.list.d/ros-latest.list)" != "$ros1_repository_entry" ]]; then
-      printf '%s\n' "$ros1_repository_entry" | sudo tee /etc/apt/sources.list.d/ros-latest.list > /dev/null
-    fi
-    if ! sudo apt-key finger 2>/dev/null | grep -q 'AB17 C654'; then
-      sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-      curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-    fi
-    sudo apt-get update
-    sudo apt-get install -yq ros-"$ROS_DISTRO_TO_INSTALL"-desktop-full
-  else
-    echo "ros-$ROS_DISTRO_TO_INSTALL-desktop-full is already installed!"
-  fi
-  source /opt/ros/"$ROS_DISTRO_TO_INSTALL"/setup.bash
-
-  # Install rosdep and other necessary tools
-  if [ $PY_VERSION == 2 ]; then
-    sudo apt-get install -yq        \
-      python-rosdep                 \
-      python-rosinstall             \
-      python-rosinstall-generator   \
-      python-wstool                 \
-      build-essential
-  elif [ $PY_VERSION == 3 ]; then
-    sudo apt-get install -yq        \
-      python3-rosdep                \
-      python3-rosinstall            \
-      python3-rosinstall-generator  \
-      python3-wstool                \
-      build-essential
-  fi
-
-  # Initialize rosdep sources only when they have not been initialized yet.
-  if [[ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]]; then
-    sudo rosdep init || failed "Failed to initialize rosdep sources."
-  fi
-
-  # Update local rosdep database, including EoL distros
-  rosdep update --include-eol-distros
-
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_core" "$ROS_DISTRO_TO_INSTALL" "https://github.com/Interbotix/interbotix_ros_core.git"
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_manipulators" "$ROS_DISTRO_TO_INSTALL" "https://github.com/Interbotix/interbotix_ros_manipulators.git"
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_toolboxes" "$ROS_DISTRO_TO_INSTALL" "https://github.com/Interbotix/interbotix_ros_toolboxes.git"
-
-  # Reconcile workspace configuration and build on every run so partial or stale builds recover.
-  cd "$INSTALL_PATH/src" || failed "Could not enter the workspace source directory '$INSTALL_PATH/src'."
-  rm -f interbotix_ros_core/interbotix_ros_xseries/CATKIN_IGNORE      \
-    interbotix_ros_manipulators/interbotix_ros_xsarms/CATKIN_IGNORE   \
-    interbotix_ros_toolboxes/interbotix_rpi_toolbox/CATKIN_IGNORE     \
-    interbotix_ros_toolboxes/interbotix_xs_toolbox/CATKIN_IGNORE      \
-    interbotix_ros_toolboxes/interbotix_common_toolbox/interbotix_moveit_interface/CATKIN_IGNORE
-  cd interbotix_ros_core/interbotix_ros_xseries/interbotix_xs_sdk || failed "Interbotix SDK directory is missing."
-  if [[ ! -f /etc/udev/rules.d/99-interbotix-udev.rules ]] || \
-     ! cmp -s 99-interbotix-udev.rules /etc/udev/rules.d/99-interbotix-udev.rules; then
-    sudo install -m 0644 99-interbotix-udev.rules /etc/udev/rules.d/99-interbotix-udev.rules
-    sudo udevadm control --reload-rules && sudo udevadm trigger
-  fi
-  cd "$INSTALL_PATH" || failed "Could not enter the workspace '$INSTALL_PATH'."
-  rosdep install --from-paths src --ignore-src -r -y
-  if catkin_make; then
-    echo -e "${GRN}${BOLD}Interbotix Arm ROS Packages built successfully!${NORM}${OFF}"
-    source "$INSTALL_PATH"/devel/setup.bash
-  else
-    failed "Failed to build Interbotix Arm ROS Packages."
-  fi
+  python3 -m pip install "${pip_install_args[@]}" modern_robotics
 }
 
 function install_ros2() {
@@ -396,10 +286,13 @@ function install_ros2() {
   # Update local rosdep database, including EoL distros
   rosdep update --include-eol-distros
 
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_core" "$interbotix_branch" "https://github.com/Interbotix/interbotix_ros_core.git"
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_manipulators" "$interbotix_branch" "https://github.com/Interbotix/interbotix_ros_manipulators.git"
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_toolboxes" "$interbotix_branch" "https://github.com/Interbotix/interbotix_ros_toolboxes.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_core" "$interbotix_branch" "https://github.com/$GITHUB_SOURCE/interbotix_ros_core.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_manipulators" "$interbotix_branch" "https://github.com/$GITHUB_SOURCE/interbotix_ros_manipulators.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_toolboxes" "$interbotix_branch" "https://github.com/$GITHUB_SOURCE/interbotix_ros_toolboxes.git"
   ensure_repository "$INSTALL_PATH/src/moveit_visual_tools" "ros2" "https://github.com/ros-planning/moveit_visual_tools.git"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_core"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_manipulators"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_toolboxes"
 
   # Reconcile workspace configuration and build on every run so partial or stale builds recover.
   cd "$INSTALL_PATH/src" || failed "Could not enter the workspace source directory '$INSTALL_PATH/src'."
@@ -427,17 +320,22 @@ function install_ros2() {
 }
 
 # parse command line arguments
-while getopts 'hd:p:n' OPTION;
+while getopts 'hd:p:s:n' OPTION;
 do
   case "$OPTION" in
     h) help && exit 0;;
     n) NONINTERACTIVE=true;;
     d) ROS_DISTRO_TO_INSTALL="$OPTARG" && DISTRO_SET_FROM_CL=true;;
     p) INSTALL_PATH="$OPTARG";;
+    s) GITHUB_SOURCE="$OPTARG";;
     *) echo "Unknown argument $OPTION" && help && exit 0;;
   esac
 done
 shift "$((OPTIND -1))"
+
+if [[ "$GITHUB_SOURCE" != "emackinnon1" && "$GITHUB_SOURCE" != "Interbotix" ]]; then
+  failed "GitHub source '$GITHUB_SOURCE' is invalid. Choose 'emackinnon1' or 'Interbotix'."
+fi
 
 if [[ "$INSTALL_PATH" == "~" ]]; then
   INSTALL_PATH="$HOME"
@@ -460,11 +358,7 @@ UBUNTU_VERSION="$(lsb_release -rs)"
 
 # set default ROS distro before reading clargs
 if [ "$DISTRO_SET_FROM_CL" = false ]; then
-  if [ "$UBUNTU_VERSION" == "18.04" ]; then
-    ROS_DISTRO_TO_INSTALL="melodic"
-  elif [ "$UBUNTU_VERSION" == "20.04" ]; then
-    ROS_DISTRO_TO_INSTALL="noetic"
-  elif [ "$UBUNTU_VERSION" == "22.04" ]; then
+  if [ "$UBUNTU_VERSION" == "22.04" ]; then
     ROS_DISTRO_TO_INSTALL="humble"
   elif [ "$UBUNTU_VERSION" == "24.04" ]; then
     ROS_DISTRO_TO_INSTALL="jazzy"
@@ -472,7 +366,7 @@ if [ "$DISTRO_SET_FROM_CL" = false ]; then
     ROS_DISTRO_TO_INSTALL="lyrical"
   else
     echo -e "${BOLD}${RED}Unsupported Ubuntu version: $UBUNTU_VERSION.${NORM}${OFF}"
-    failed "Supported Ubuntu versions are 18.04 Bionic, 20.04 Focal, 22.04 Jammy, 24.04 Noble, and 26.04 Resolute."
+    failed "Supported Ubuntu versions are 22.04 Jammy, 24.04 Noble, and 26.04 Resolute."
   fi
 fi
 
@@ -491,7 +385,7 @@ if [ "$NONINTERACTIVE" = false ]; then
   fi
 
   echo -e "${BLU}${BOLD}RASPBERRY PI INSTALLATION SUMMARY:"
-  echo -e "\tROS Distribution:              ROS ${ROS_VERSION_TO_INSTALL} ${ROS_DISTRO_TO_INSTALL}"
+  echo -e "\tROS Distribution:              ROS 2 ${ROS_DISTRO_TO_INSTALL}"
   echo -e "\tInstallation path:             ${INSTALL_PATH}"
   echo -e "\nIs this correct?\n${PROMPT}${NORM}${OFF}\c"
   read -r resp
@@ -524,13 +418,7 @@ mkdir -p "$INSTALL_PATH"/src
 
 shopt -s extglob
 
-if [[ $ROS_VERSION_TO_INSTALL == 1 ]]; then
-  install_ros1
-elif [[ $ROS_VERSION_TO_INSTALL == 2 ]]; then
-  install_ros2
-else
-  failed "Something went wrong. ROS_VERSION_TO_INSTALL=$ROS_VERSION_TO_INSTALL."
-fi
+install_ros2
 
 setup_shell_profile
 

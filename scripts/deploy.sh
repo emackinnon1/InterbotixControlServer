@@ -1,135 +1,54 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e  # Exit on any error
+set -euo pipefail
 
-# Allow override but ensure a default HTTP health-check delay
-HTTP_CHECK_DELAY="${HTTP_CHECK_DELAY:-10}"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+SERVICE_NAME="interbotix-control.service"
+HEALTH_URL="${HEALTH_URL:-http://127.0.0.1:8000/}"
+HEALTH_TIMEOUT="${HEALTH_TIMEOUT:-60}"
+HEALTH_INTERVAL="${HEALTH_INTERVAL:-2}"
 
-echo "=== InterbotixControlServer Deployment Script ==="
-
-# Function to log with timestamp
 log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+    printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
 }
 
-# Function to cleanup existing services
-cleanup_services() {
-    ./scripts/cleanup.sh
-}
+if [[ "$EUID" -eq 0 ]]; then
+    printf 'Run deployment as the service user, not with sudo.\n' >&2
+    exit 1
+fi
+if [[ "$(id -un)" != "emackinnon1" || "$HOME" != "/home/emackinnon1" ]]; then
+    printf 'Deployment must run as emackinnon1 with HOME=/home/emackinnon1.\n' >&2
+    exit 1
+fi
 
-# Function to start Caddy
-start_caddy() {
-    log "Starting Caddy..."
-    if caddy start; then
-        log "Caddy started successfully"
-    else
-        log "ERROR: Failed to start Caddy"
-        return 1
+if ! command -v uv >/dev/null 2>&1; then
+    printf 'uv is required on PATH to sync the application environment.\n' >&2
+    exit 1
+fi
+
+cd "$REPO_DIR"
+log "Syncing application dependencies..."
+uv sync --locked --python /usr/bin/python3
+
+log "Stopping the current FastAPI service..."
+bash "$SCRIPT_DIR/cleanup.sh"
+
+log "Starting $SERVICE_NAME..."
+systemctl --user start "$SERVICE_NAME"
+
+deadline=$((SECONDS + HEALTH_TIMEOUT))
+while ((SECONDS <= deadline)); do
+    if curl --fail --silent --max-time 2 --output /dev/null "$HEALTH_URL"; then
+        log "FastAPI is healthy at $HEALTH_URL."
+        exit 0
     fi
-}
-
-# Function to start FastAPI with proper detachment
-start_fastapi() {
-    log "Starting FastAPI in detached mode..."
-    
-    # Create a completely detached process using multiple techniques
-    (
-        # Create new session
-        setsid bash -c '
-            # Redirect all file descriptors
-            exec 0</dev/null
-            exec 1>/tmp/uvicorn.log
-            exec 2>&1
-            
-            # Change to the correct directory
-            cd /home/emackinnon1/InterbotixControlServer
-            
-            # Source ROS environment if it exists
-            if [ -f workspace/install/setup.bash ]; then
-                source workspace/install/setup.bash
-            fi
-            
-            # Start uvicorn and capture PID
-            uv run uvicorn main:app --host 0.0.0.0 --port 8000 &
-            echo $! > /tmp/uvicorn.pid
-            
-            # Wait for the background process
-            wait
-        ' &
-    ) &
-    
-    # Give it time to start
-    sleep 5
-    
-    # Verify it started
-    if [ -f /tmp/uvicorn.pid ] && kill -0 "$(cat /tmp/uvicorn.pid)" 2>/dev/null; then
-        log "FastAPI started successfully with PID $(cat /tmp/uvicorn.pid)"
-        return 0
-    else
-        log "ERROR: FastAPI failed to start"
-        if [ -f /tmp/uvicorn.log ]; then
-            log "Last few lines of uvicorn log:"
-            tail -10 /tmp/uvicorn.log
-        fi
-        return 1
+    if ! systemctl --user is-active --quiet "$SERVICE_NAME"; then
+        break
     fi
-}
+    sleep "$HEALTH_INTERVAL"
+done
 
-# Function to verify services are running
-verify_services() {
-    log "Verifying services..."
-    
-    # Check Caddy
-    if pgrep -f "caddy" > /dev/null; then
-        log "✓ Caddy is running"
-    else
-        log "✗ Caddy is not running"
-        return 1
-    fi
-    
-    # Check FastAPI
-    if pgrep -f "uvicorn main:app" > /dev/null; then
-        log "✓ FastAPI is running"
-    else
-        log "✗ FastAPI is not running"
-        return 1
-    fi
-    
-    # Check HTTP response (wait briefly before probing)
-    log "Waiting ${HTTP_CHECK_DELAY}s before HTTP health check..."
-    sleep "${HTTP_CHECK_DELAY}"
-    if curl -s -f http://localhost:8000/ > /dev/null; then
-        log "✓ FastAPI is responding to HTTP requests"
-    else
-        log "✗ FastAPI is not responding to HTTP requests"
-        return 1
-    fi
-    
-    log "All services verified successfully!"
-    return 0
-}
-
-# Main deployment process
-main() {
-    log "Starting deployment process..."
-    
-    # Ensure we're in the right directory
-    cd /home/emackinnon1/InterbotixControlServer
-    
-    # Step 1: Cleanup
-    cleanup_services
-    
-    # Step 2: Start Caddy
-    start_caddy
-    
-    # Step 3: Start FastAPI
-    start_fastapi
-    
-    # Step 4: Verify everything is working
-    verify_services
-    
-    log "Deployment completed successfully!"
-}
-
-# Run main function
-main "$@"
+log "ERROR: FastAPI did not become healthy at $HEALTH_URL."
+journalctl --user -u "$SERVICE_NAME" --since '-2 minutes' --no-pager >&2 || true
+exit 1
