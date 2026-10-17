@@ -8,7 +8,7 @@ The FastAPI lifespan starts ROS, initializes the robot, and starts the arm movem
 ### Cleaning ros build
 If the ROS build enters a broken state, sometimes the easiest solution is to do a clean build. Delete the `/workspace` directory and remove the desktop package for your installed ROS distro (for example `ros-jazzy-desktop`):
 ```bash
-sudo apt-get remove "ros-${ROS_DISTRO:-humble}-desktop" && sudo apt-get autoremove
+sudo apt-get remove "ros-${ROS_DISTRO:-jazzy}-desktop" && sudo apt-get autoremove
 ```
 Then, run the `xsarm_rpi_install.sh` again.
 
