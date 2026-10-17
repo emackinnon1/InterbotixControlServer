@@ -14,6 +14,7 @@ DEFAULT_WAIT_TIME = 1.75 * DEFAULT_MOVING_TIME
 
 WAIST_PICKUP_POSITION = -np.pi/1.89
 WAIST_BOTTLE_POSITION = -np.pi/5.65
+WAIST_ROTATION = -np.pi/4.2
 WAIST_POSITION_POST_OPEN_POSITION = -np.pi/2
 WRIST_ROTATE_GRASP = np.pi/2
 WRIST_ROTATE_INITIAL = np.pi/3.3
@@ -27,15 +28,12 @@ BOTTLE_RAISE_DISTANCE = 0.1
 
 BRAND_CONFIGS = {
     "sapporo": {
-        "waist_rotation": -np.pi/5,
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "heineken": {
-        "waist_rotation": -np.pi/4.2,
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "corona": {
-        "waist_rotation": -np.pi/4.2,
         "bottle_lower_distance": -0.185
     }
 }
@@ -169,17 +167,16 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         brand_config = BRAND_CONFIGS.get(self.brand)
         if not brand_config:
             raise ValueError(f"Unknown brand: {self.brand}")
-            
-        waist_rotation = brand_config.get("waist_rotation")
+
         bottle_lower_distance = brand_config.get("bottle_lower_distance")
         
-        if waist_rotation is None or bottle_lower_distance is None:
+        if bottle_lower_distance is None:
             raise ValueError(f"Incomplete configuration for brand: {self.brand}")
             
         return MovementSequence("open_bottle", [
             Movement(MovementType.CARTESIAN_MOVE, {'z': bottle_lower_distance}, "Lower to bottle level"),
             Movement(MovementType.WAIT, {'duration': 2.0}, "Wait at bottle level"),
-            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': waist_rotation}, "Position opener on bottle cap"),
+            Movement(MovementType.JOINT_MOVE, {'joint_name': 'waist', 'position': WAIST_ROTATION}, "Position opener on bottle cap"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for positioning"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_OPEN, 'moving_time': 0.3}, "Rotate wrist to open", skip_default_wait=True),
             Movement(MovementType.CARTESIAN_MOVE, {'z': BOTTLE_RAISE_DISTANCE, 'moving_time': 0.3}, "Raise while opening", skip_default_wait=True),
