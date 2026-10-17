@@ -26,8 +26,9 @@ RESOLUTE_VALID_DISTROS=('lyrical')
 NONINTERACTIVE=false
 INSTALL_PATH=~/InterbotixControlServer/workspace
 DISTRO_SET_FROM_CL=false
+GITHUB_SOURCE=emackinnon1
 
-_usage="${BOLD}USAGE: ./xsarm_rpi_install.sh [-h][-d DISTRO][-p PATH][-n]${NORM}
+_usage="${BOLD}USAGE: ./xsarm_rpi_install.sh [-h][-d DISTRO][-p PATH][-s SOURCE][-n]${NORM}
 
 Install the Interbotix X-Series Arms Raspberry Pi packages and their dependencies.
 
@@ -42,6 +43,8 @@ Options:
 
   -p PATH         Sets the absolute install location for the Interbotix workspace. If not specified,
                   the Interbotix workspace directory will default to '~/InterbotixControlServer/workspace'.
+
+  -s SOURCE       GitHub source for Interbotix repositories: emackinnon1 or Interbotix. Defaults to emackinnon1.
 
   -n              Install all packages without prompting. This is useful
                   if you're running this script in a non-interactive terminal like when building a
@@ -115,6 +118,18 @@ function ensure_repository() {
   fi
 
   git clone -b "$branch" "$repository_url" "$repository_path" || failed "Failed to clone '$repository_url'."
+}
+
+function configure_submodule_sources() {
+  local repository_path="$1"
+  local submodule_key submodule_url
+
+  while read -r submodule_key submodule_url; do
+    if [[ "$submodule_url" == https://github.com/Interbotix/* ]]; then
+      submodule_url="${submodule_url/Interbotix/$GITHUB_SOURCE}"
+      git -C "$repository_path" config "$submodule_key" "$submodule_url"
+    fi
+  done < <(git -C "$repository_path" config -f .gitmodules --get-regexp '^submodule\..*\.url$' 2>/dev/null || true)
 }
 
 function ensure_submodule() {
@@ -325,9 +340,12 @@ function install_ros1() {
   # Update local rosdep database, including EoL distros
   rosdep update --include-eol-distros
 
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_core" "$ROS_DISTRO_TO_INSTALL" "https://github.com/Interbotix/interbotix_ros_core.git"
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_manipulators" "$ROS_DISTRO_TO_INSTALL" "https://github.com/Interbotix/interbotix_ros_manipulators.git"
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_toolboxes" "$ROS_DISTRO_TO_INSTALL" "https://github.com/Interbotix/interbotix_ros_toolboxes.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_core" "$ROS_DISTRO_TO_INSTALL" "https://github.com/$GITHUB_SOURCE/interbotix_ros_core.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_manipulators" "$ROS_DISTRO_TO_INSTALL" "https://github.com/$GITHUB_SOURCE/interbotix_ros_manipulators.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_toolboxes" "$ROS_DISTRO_TO_INSTALL" "https://github.com/$GITHUB_SOURCE/interbotix_ros_toolboxes.git"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_core"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_manipulators"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_toolboxes"
 
   # Reconcile workspace configuration and build on every run so partial or stale builds recover.
   cd "$INSTALL_PATH/src" || failed "Could not enter the workspace source directory '$INSTALL_PATH/src'."
@@ -396,10 +414,13 @@ function install_ros2() {
   # Update local rosdep database, including EoL distros
   rosdep update --include-eol-distros
 
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_core" "$interbotix_branch" "https://github.com/Interbotix/interbotix_ros_core.git"
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_manipulators" "$interbotix_branch" "https://github.com/Interbotix/interbotix_ros_manipulators.git"
-  ensure_repository "$INSTALL_PATH/src/interbotix_ros_toolboxes" "$interbotix_branch" "https://github.com/Interbotix/interbotix_ros_toolboxes.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_core" "$interbotix_branch" "https://github.com/$GITHUB_SOURCE/interbotix_ros_core.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_manipulators" "$interbotix_branch" "https://github.com/$GITHUB_SOURCE/interbotix_ros_manipulators.git"
+  ensure_repository "$INSTALL_PATH/src/interbotix_ros_toolboxes" "$interbotix_branch" "https://github.com/$GITHUB_SOURCE/interbotix_ros_toolboxes.git"
   ensure_repository "$INSTALL_PATH/src/moveit_visual_tools" "ros2" "https://github.com/ros-planning/moveit_visual_tools.git"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_core"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_manipulators"
+  configure_submodule_sources "$INSTALL_PATH/src/interbotix_ros_toolboxes"
 
   # Reconcile workspace configuration and build on every run so partial or stale builds recover.
   cd "$INSTALL_PATH/src" || failed "Could not enter the workspace source directory '$INSTALL_PATH/src'."
@@ -427,17 +448,22 @@ function install_ros2() {
 }
 
 # parse command line arguments
-while getopts 'hd:p:n' OPTION;
+while getopts 'hd:p:s:n' OPTION;
 do
   case "$OPTION" in
     h) help && exit 0;;
     n) NONINTERACTIVE=true;;
     d) ROS_DISTRO_TO_INSTALL="$OPTARG" && DISTRO_SET_FROM_CL=true;;
     p) INSTALL_PATH="$OPTARG";;
+    s) GITHUB_SOURCE="$OPTARG";;
     *) echo "Unknown argument $OPTION" && help && exit 0;;
   esac
 done
 shift "$((OPTIND -1))"
+
+if [[ "$GITHUB_SOURCE" != "emackinnon1" && "$GITHUB_SOURCE" != "Interbotix" ]]; then
+  failed "GitHub source '$GITHUB_SOURCE' is invalid. Choose 'emackinnon1' or 'Interbotix'."
+fi
 
 if [[ "$INSTALL_PATH" == "~" ]]; then
   INSTALL_PATH="$HOME"
