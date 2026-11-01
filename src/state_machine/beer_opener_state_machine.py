@@ -11,6 +11,7 @@ from src.dependencies.robot_manager import get_robot_manager
 
 DEFAULT_MOVING_TIME = 1.1
 DEFAULT_WAIT_TIME = 1.75 * DEFAULT_MOVING_TIME
+DEFAULT_WAIST_ROTATION = -np.pi/4.2
 
 WAIST_PICKUP_POSITION = -np.pi/1.89
 WAIST_BOTTLE_POSITION = -np.pi/5.65
@@ -27,7 +28,7 @@ BOTTLE_RAISE_DISTANCE = 0.1
 
 BRAND_CONFIGS = {
     "sapporo": {
-        "waist_rotation": -np.pi/5,
+        "waist_rotation": -np.pi/4.2,
         "bottle_lower_distance": BOTTLE_LOWER_DISTANCE
     },
     "heineken": {
@@ -37,6 +38,10 @@ BRAND_CONFIGS = {
     "corona": {
         "waist_rotation": -np.pi/4.2,
         "bottle_lower_distance": -0.185
+    },
+    "clausthaler": {
+        "waist_rotation": -np.pi/4.13,
+        "bottle_lower_distance": -0.218
     }
 }
 
@@ -131,7 +136,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         
         approach_bottle_sequence = MovementSequence("approach_bottle", [
             Movement(MovementType.GO_HOME, {}, "Go to home pose"),
-            Movement(MovementType.POSE_COMPONENTS, {'x': 0.265, 'z': 0.35}, "Move to bottle approach position"),
+            Movement(MovementType.POSE_COMPONENTS, {'x': 0.269, 'z': 0.35}, "Move to bottle approach position"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait at approach position"),
             Movement(MovementType.JOINT_MOVE, {'joint_name': 'wrist_rotate', 'position': WRIST_ROTATE_INITIAL}, "Rotate wrist for bottle"),
             Movement(MovementType.WAIT, {'duration': 1.0}, "Wait for wrist rotation"),
@@ -170,7 +175,7 @@ class BeerOpenerStateMachine(AbstractStateMachine[BeerOpenerState]):
         if not brand_config:
             raise ValueError(f"Unknown brand: {self.brand}")
             
-        waist_rotation = brand_config.get("waist_rotation")
+        waist_rotation = brand_config.get("waist_rotation", DEFAULT_WAIST_ROTATION)
         bottle_lower_distance = brand_config.get("bottle_lower_distance")
         
         if waist_rotation is None or bottle_lower_distance is None:

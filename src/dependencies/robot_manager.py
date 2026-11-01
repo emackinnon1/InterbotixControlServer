@@ -28,7 +28,7 @@ class RobotConnectionManager:
                     robot_model=self._robot_model,
                     group_name="arm",
                     gripper_name="gripper",
-                    moving_time=2.0,
+                    moving_time=1.0,
                     gripper_pressure=0.9,
                 )
                 try:
