@@ -45,4 +45,8 @@ jobs:
         run: bash scripts/update-deployment-checkout.sh
 
       - name: Deploy application
-        run: bash /home/emackinnon1/InterbotixControlServer/scripts/deploy.sh
+        run: |
+          export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+          export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+          bash /home/emackinnon1/InterbotixControlServer/scripts/deploy.sh
+        # run: bash /home/emackinnon1/InterbotixControlServer/scripts/deploy.sh
