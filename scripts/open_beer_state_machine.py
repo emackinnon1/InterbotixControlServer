@@ -27,6 +27,14 @@ BRAND_CONFIGS = {
     },
     "heineken": {
         "waist_rotation": -np.pi/4.75
+    },
+    "corona": {
+        "waist_rotation": -np.pi/4.75,
+        "bottle_lower_distance": -0.182
+    },
+    "clausthaler": {
+        "waist_rotation": -np.pi/4.13,
+        "bottle_lower_distance": -0.218
     }
 }
 

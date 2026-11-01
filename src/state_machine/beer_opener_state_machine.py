@@ -40,8 +40,8 @@ BRAND_CONFIGS = {
         "bottle_lower_distance": -0.185
     },
     "clausthaler": {
-        "waist_rotation": -np.pi/4.2,
-        "bottle_lower_distance": -0.215
+        "waist_rotation": -np.pi/4.13,
+        "bottle_lower_distance": -0.218
     }
 }
 
