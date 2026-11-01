@@ -21,6 +21,7 @@ class BeerBrandEnum(Enum):
     corona = "corona"
     sapporo = "sapporo"
     heineken = "heineken"
+    clausthaler = "clausthaler"
 
 class StartBeerOpenerRequest(BaseModel):
     brand: BeerBrandEnum
