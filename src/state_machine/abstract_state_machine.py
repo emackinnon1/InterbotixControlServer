@@ -138,8 +138,7 @@ class AbstractStateMachine(Generic[StateType], ABC):
         try:
             # Initialize robot
             self.bot.core.robot_torque_enable(cmd_type='group', name='all', enable=False)
-            self.bot.core.robot_reboot_motors(cmd_type='group', name='all', enable=False, smart_reboot=True)
-            self.bot.core.robot_torque_enable(cmd_type='group', name='all', enable=True)
+            self.bot.core.robot_reboot_motors(cmd_type='group', name='all', enable=True)
             
             # Run the state machine
             success = self.run()
